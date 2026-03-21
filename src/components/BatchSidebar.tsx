@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Papa from 'papaparse';
+import * as XLSX from 'xlsx';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import QRCodeStyling from 'qr-code-styling';
@@ -23,18 +24,38 @@ export default function BatchSidebar({ options }: BatchSidebarProps) {
     setFile(uploadedFile);
     setError('');
     
-    Papa.parse(uploadedFile, {
-      skipEmptyLines: true,
-      complete: (results) => {
-        const rows = results.data as string[][];
-        // filter out completely empty rows
-        const validRows = rows.filter(row => row.some(cell => cell.trim() !== ''));
-        setData(validRows);
-      },
-      error: (err: any) => {
-        setError('เกิดข้อผิดพลาดในการอ่านไฟล์: ' + err.message);
-      }
-    });
+    const fileExt = uploadedFile.name.split('.').pop()?.toLowerCase();
+
+    if (fileExt === 'csv') {
+      Papa.parse(uploadedFile, {
+        skipEmptyLines: true,
+        complete: (results) => {
+          const rows = results.data as string[][];
+          const validRows = rows.filter(row => row.some(cell => cell && typeof cell === 'string' && cell.trim() !== ''));
+          setData(validRows);
+        },
+        error: (err: any) => setError('เกิดข้อผิดพลาดในการอ่านไฟล์: ' + err.message)
+      });
+    } else if (fileExt === 'xls' || fileExt === 'xlsx') {
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        try {
+          const dataContent = evt.target?.result;
+          const workbook = XLSX.read(dataContent, { type: 'binary' });
+          const firstSheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[firstSheetName];
+          const rows = XLSX.utils.sheet_to_json<any[]>(worksheet, { header: 1 });
+          const validRows = rows.filter(row => row && row.length > 0 && row.some(cell => cell && String(cell).trim() !== ''));
+          const stringRows = validRows.map(row => row.map(cell => String(cell || '')));
+          setData(stringRows);
+        } catch (err: any) {
+          setError('เกิดข้อผิดพลาดในการอ่านไฟล์ Excel: ' + err.message);
+        }
+      };
+      reader.readAsBinaryString(uploadedFile);
+    } else {
+      setError('รองรับเฉพาะไฟล์ .csv, .xls, .xlsx เท่านั้น');
+    }
   };
 
   const generateZip = async () => {
@@ -95,20 +116,39 @@ export default function BatchSidebar({ options }: BatchSidebarProps) {
       <h2 className="section-title"><Upload size={20} aria-hidden="true" /> สร้างหลายรูปพร้อมกัน (Batch Generator)</h2>
       
       <div className="form-group" style={{ marginTop: '1.5rem' }}>
-        <label className="label" htmlFor="csv-upload">อัปโหลดไฟล์ CSV (1 หรือ 2 คอลัมน์)</label>
+        <label className="label" htmlFor="csv-upload">อัปโหลดไฟล์ Excel (.xlsx, .xls) หรือ CSV</label>
         <div style={{ background: 'var(--input-bg)', padding: '1.5rem', borderRadius: 'var(--radius-lg)', textAlign: 'center', border: '1px dashed var(--input-border)' }}>
           <input 
             id="csv-upload" 
             type="file" 
-            accept=".csv"
+            accept=".csv, .xls, .xlsx, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
             onChange={handleFileUpload} 
             disabled={isGenerating}
-            style={{ width: '100%', cursor: 'pointer', color: 'var(--text-main)' }}
+            style={{ width: '100%', cursor: 'pointer', color: 'var(--text-main)', marginBottom: '10px' }}
           />
-          <p style={{ marginTop: '1rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-            ไฟล์ CSV ที่มีข้อมูลที่ต้องการสร้าง QR Code <br/>
-            (คอลัมน์แรก: ชื่อไฟล์ (ไม่บังคับ), คอลัมน์ที่สอง: ข้อมูลลิงก์/ข้อความ)
-          </p>
+          
+          <div style={{ marginTop: '1rem', padding: '12px', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', textAlign: 'left', fontSize: '0.85rem' }}>
+            <p style={{ color: 'var(--text-main)', fontWeight: 600, marginBottom: '8px' }}>💡 วิธีเตรียมตารางในโปรแกรม Excel ให้ถูกต้อง:</p>
+            <p style={{ color: 'var(--text-muted)' }}>ให้สร้างตารางที่มี 2 คอลัมน์ (ไม่ต้องมีหัวกระดาษ) ดังนี้:</p>
+            <table style={{ width: '100%', marginTop: '6px', borderCollapse: 'collapse', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                  <th style={{ padding: '6px', textAlign: 'left', width: '40%' }}>คอลัมน์ A (ชื่อไฟล์รูป)</th>
+                  <th style={{ padding: '6px', textAlign: 'left' }}>คอลัมน์ B (ลิงก์/ข้อความ QR)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style={{ padding: '6px' }}>poster-sale</td>
+                  <td style={{ padding: '6px', opacity: 0.8 }}>https://example.com/sale</td>
+                </tr>
+                <tr>
+                  <td style={{ padding: '6px', fontSize: '0.75rem', opacity: 0.6 }}>(เว้นว่างได้ ระบบจะตั้งให้เอง)</td>
+                  <td style={{ padding: '6px', opacity: 0.8 }}>https://example.com/promo</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
