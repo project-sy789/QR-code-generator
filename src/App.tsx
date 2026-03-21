@@ -1,71 +1,104 @@
 import { useState, useEffect } from 'react';
 import './App.css';
-import { QrCode } from 'lucide-react';
+import { QrCode, Moon, Sun } from 'lucide-react';
 import DataSidebar from './components/DataSidebar';
 import StyleSidebar from './components/StyleSidebar';
 import QRCodePreview, { type QRCodeOptions } from './components/QRCodePreview';
 import { buildQRDataString, type QRDataState } from './utils/qrBuilders';
 
+const DEFAULT_DATA_STATE: QRDataState = {
+  type: 'url',
+  url: 'https://github.com/project-sy789/QR-code-generator',
+  text: '',
+  email: { address: '', subject: '', body: '' },
+  phone: '',
+  sms: { phone: '', message: '' },
+  wifi: { ssid: '', password: '', encryption: 'WPA', hidden: false },
+  vcard: { firstName: '', lastName: '', phone: '', email: '', company: '', title: '', website: '' }
+};
+
+const DEFAULT_QR_OPTIONS: QRCodeOptions = {
+  data: 'https://github.com/project-sy789/QR-code-generator',
+  width: 340,
+  height: 340,
+  margin: 10,
+  errorCorrectionLevel: 'H',
+  dotsOptions: { color: '#ffffff', type: 'rounded' },
+  backgroundOptions: { color: '#1a1f2b' },
+  cornersSquareOptions: { color: '#6366f1', type: 'extra-rounded' },
+  cornersDotOptions: { color: '#ec4899', type: 'dot' },
+  imageOptions: { crossOrigin: 'anonymous', margin: 10 }
+};
+
 function App() {
-  const [dataState, setDataState] = useState<QRDataState>({
-    type: 'url',
-    url: 'https://github.com/project-sy789/QR-code-generator',
-    text: '',
-    email: { address: '', subject: '', body: '' },
-    phone: '',
-    sms: { phone: '', message: '' },
-    wifi: { ssid: '', password: '', encryption: 'WPA', hidden: false },
-    vcard: { firstName: '', lastName: '', phone: '', email: '', company: '', title: '', website: '' }
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    return (localStorage.getItem('qr-theme') as 'dark' | 'light') || 'dark';
   });
 
-  const [qrOptions, setQrOptions] = useState<QRCodeOptions>({
-    data: 'https://github.com/project-sy789/QR-code-generator',
-    width: 340,
-    height: 340,
-    margin: 10,
-    errorCorrectionLevel: 'Q',
-    dotsOptions: {
-      color: '#ffffff',
-      type: 'rounded'
-    },
-    backgroundOptions: {
-      color: '#1a1f2b'
-    },
-    cornersSquareOptions: {
-      color: '#6366f1',
-      type: 'extra-rounded'
-    },
-    cornersDotOptions: {
-      color: '#ec4899',
-      type: 'dot'
-    },
-    imageOptions: {
-      crossOrigin: 'anonymous',
-      margin: 10
-    }
+  const [dataState, setDataState] = useState<QRDataState>(() => {
+    const saved = localStorage.getItem('qr-data-state');
+    return saved ? JSON.parse(saved) : DEFAULT_DATA_STATE;
   });
 
-  // Whenever dataState changes, generate string and update qrOptions.data
+  const [qrOptions, setQrOptions] = useState<QRCodeOptions>(() => {
+    const saved = localStorage.getItem('qr-options');
+    return saved ? JSON.parse(saved) : DEFAULT_QR_OPTIONS;
+  });
+
+  // Apply theme to body
   useEffect(() => {
+    if (theme === 'light') {
+      document.body.classList.add('light-mode');
+    } else {
+      document.body.classList.remove('light-mode');
+    }
+    localStorage.setItem('qr-theme', theme);
+  }, [theme]);
+
+  // Sync data to QR string & Local Storage
+  useEffect(() => {
+    localStorage.setItem('qr-data-state', JSON.stringify(dataState));
     const dataString = buildQRDataString(dataState);
     if (dataString) {
       setQrOptions(prev => ({ ...prev, data: dataString }));
     }
   }, [dataState]);
 
+  // Sync options to Local Storage
+  useEffect(() => {
+    localStorage.setItem('qr-options', JSON.stringify(qrOptions));
+  }, [qrOptions]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  };
+
   return (
     <div className="app-container">
-      <div className="main-header">
-        <QrCode className="header-icon" />
-        <h1>Antigravity QR Generator</h1>
-      </div>
+      <header className="main-header" style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <QrCode className="header-icon" aria-hidden="true" />
+          <h1>Antigravity QR Generator</h1>
+        </div>
+        <button 
+          className="btn btn-secondary" 
+          onClick={toggleTheme} 
+          aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          style={{ padding: '10px 14px', borderRadius: 'var(--radius-lg)' }}
+        >
+          {theme === 'dark' ? <Sun size={20} aria-label="Sun icon" /> : <Moon size={20} aria-label="Moon icon" />}
+        </button>
+      </header>
 
-      <div className="sidebar glass-panel">
+      <main className="sidebar glass-panel" aria-label="Controls Sidebar">
         <DataSidebar dataState={dataState} setDataState={setDataState} />
         <StyleSidebar options={qrOptions} setOptions={setQrOptions} />
-      </div>
+      </main>
 
-      <QRCodePreview options={qrOptions} />
+      <aside aria-label="QR Code Preview">
+        <QRCodePreview options={qrOptions} />
+      </aside>
     </div>
   );
 }
