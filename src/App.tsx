@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import './App.css';
 import { QrCode, Moon, Sun } from 'lucide-react';
+import { motion } from 'framer-motion';
 import DataSidebar from './components/DataSidebar';
 import StyleSidebar from './components/StyleSidebar';
 import QRCodePreview, { type QRCodeOptions } from './components/QRCodePreview';
@@ -29,6 +30,9 @@ const DEFAULT_QR_OPTIONS: QRCodeOptions = {
   cornersDotOptions: { color: '#000000', type: 'square' },
   imageOptions: { crossOrigin: 'anonymous', margin: 10 }
 };
+
+// Easing definition for an Apple-like smooth spring/ease
+const springTransition = { duration: 0.8, ease: [0.16, 1, 0.3, 1] as const };
 
 function App() {
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
@@ -75,7 +79,13 @@ function App() {
 
   return (
     <div className="app-container">
-      <header className="main-header" style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+      <motion.header 
+        className="main-header" 
+        style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}
+        initial={{ opacity: 0, y: -20, filter: 'blur(10px)' }}
+        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+        transition={springTransition}
+      >
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <QrCode className="header-icon" aria-hidden="true" />
           <h1>โปรแกรมสร้างคิวอาร์โค้ด</h1>
@@ -89,16 +99,27 @@ function App() {
         >
           {theme === 'dark' ? <Sun size={20} aria-label="Sun icon" /> : <Moon size={20} aria-label="Moon icon" />}
         </button>
-      </header>
+      </motion.header>
 
-      <main className="sidebar glass-panel" aria-label="Controls Sidebar">
+      <motion.main 
+        className="sidebar glass-panel" 
+        aria-label="Controls Sidebar"
+        initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
+        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+        transition={{ ...springTransition, delay: 0.1 }}
+      >
         <DataSidebar dataState={dataState} setDataState={setDataState} />
         <StyleSidebar options={qrOptions} setOptions={setQrOptions} />
-      </main>
+      </motion.main>
 
-      <aside aria-label="QR Code Preview">
+      <motion.aside 
+        aria-label="QR Code Preview"
+        initial={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }}
+        animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+        transition={{ ...springTransition, delay: 0.2 }}
+      >
         <QRCodePreview options={qrOptions} />
-      </aside>
+      </motion.aside>
     </div>
   );
 }
