@@ -35,10 +35,10 @@
 .sidebar {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
   height: calc(100vh - 8rem);
   overflow-y: auto;
-  padding-right: 0.5rem;
+  padding: 1.25rem;
 }
 
 /* Custom Scrollbar for sidebar */
@@ -47,6 +47,7 @@
 }
 .sidebar::-webkit-scrollbar-track {
   background: transparent;
+  margin: 1rem 0;
 }
 .sidebar::-webkit-scrollbar-thumb {
   background: var(--panel-border);
@@ -57,7 +58,7 @@
 }
 
 .control-section {
-  padding: 1.5rem;
+  padding: 0;
 }
 
 .section-title {

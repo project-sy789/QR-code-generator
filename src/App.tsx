@@ -116,7 +116,7 @@ function App() {
         animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
         transition={{ ...springTransition, delay: 0.1 }}
       >
-        <div style={{ display: 'flex', gap: '8px', marginBottom: '1.5rem', background: 'var(--input-bg)', padding: '6px', borderRadius: 'var(--radius-lg)' }}>
+        <div style={{ display: 'flex', gap: '8px', background: 'var(--input-bg)', padding: '6px', borderRadius: 'var(--radius-lg)' }}>
           <button 
             className={`btn ${appMode === 'single' ? '' : 'btn-secondary'}`} 
             onClick={() => setAppMode('single')}
