@@ -4,6 +4,7 @@ import { QrCode, Moon, Sun } from 'lucide-react';
 import { motion } from 'framer-motion';
 import DataSidebar from './components/DataSidebar';
 import StyleSidebar from './components/StyleSidebar';
+import BatchSidebar from './components/BatchSidebar';
 import QRCodePreview, { type QRCodeOptions } from './components/QRCodePreview';
 import SEOContent from './components/SEOContent';
 import { buildQRDataString, type QRDataState } from './utils/qrBuilders';
@@ -17,7 +18,10 @@ const DEFAULT_DATA_STATE: QRDataState = {
   sms: { phone: '', message: '' },
   wifi: { ssid: '', password: '', encryption: 'WPA', hidden: false },
   vcard: { firstName: '', lastName: '', phone: '', email: '', company: '', title: '', website: '' },
-  promptpay: { id: '', amount: '' }
+  promptpay: { id: '', amount: '' },
+  location: { lat: '', lng: '' },
+  crypto: { coin: 'bitcoin', address: '', amount: '' },
+  event: { title: '', location: '', start: '', end: '', description: '' }
 };
 
 const DEFAULT_QR_OPTIONS: QRCodeOptions = {
@@ -41,8 +45,10 @@ function App() {
     return (localStorage.getItem('qr-theme') as 'dark' | 'light') || 'dark';
   });
 
+  const [appMode, setAppMode] = useState<'single' | 'batch'>('single');
+
   const [dataState, setDataState] = useState<QRDataState>(() => {
-    const saved = localStorage.getItem('qr-data-state');
+    const saved = localStorage.getItem('qr-data-state-v4');
     return saved ? JSON.parse(saved) : DEFAULT_DATA_STATE;
   });
 
@@ -63,7 +69,7 @@ function App() {
 
   // Sync data to QR string & Local Storage
   useEffect(() => {
-    localStorage.setItem('qr-data-state', JSON.stringify(dataState));
+    localStorage.setItem('qr-data-state-v4', JSON.stringify(dataState));
     const dataString = buildQRDataString(dataState);
     if (dataString) {
       setQrOptions(prev => ({ ...prev, data: dataString }));
@@ -110,7 +116,28 @@ function App() {
         animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
         transition={{ ...springTransition, delay: 0.1 }}
       >
-        <DataSidebar dataState={dataState} setDataState={setDataState} />
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '1.5rem', background: 'var(--input-bg)', padding: '6px', borderRadius: 'var(--radius-lg)' }}>
+          <button 
+            className={`btn ${appMode === 'single' ? '' : 'btn-secondary'}`} 
+            onClick={() => setAppMode('single')}
+            style={{ flex: 1, padding: '10px 8px', fontSize: '0.9rem', borderRadius: 'var(--radius-md)', background: appMode === 'single' ? 'var(--primary)' : 'transparent', border: 'none' }}
+          >
+            สร้างทีละรูป (Single)
+          </button>
+          <button 
+            className={`btn ${appMode === 'batch' ? '' : 'btn-secondary'}`} 
+            onClick={() => setAppMode('batch')}
+            style={{ flex: 1, padding: '10px 8px', fontSize: '0.9rem', borderRadius: 'var(--radius-md)', background: appMode === 'batch' ? 'var(--primary)' : 'transparent', border: 'none' }}
+          >
+            สร้างแบบไฟล์ (Batch)
+          </button>
+        </div>
+
+        {appMode === 'single' ? (
+          <DataSidebar dataState={dataState} setDataState={setDataState} />
+        ) : (
+          <BatchSidebar options={qrOptions} />
+        )}
         <StyleSidebar options={qrOptions} setOptions={setQrOptions} />
       </motion.main>
 

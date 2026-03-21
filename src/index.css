@@ -163,3 +163,7 @@ body.light-mode .main-header h1 {
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

@@ -1,6 +1,6 @@
 import React from 'react';
 import type { QRDataState, QRDataType } from '../utils/qrBuilders';
-import { Link, Type, Mail, Phone, MessageSquare, Wifi, Contact2, CreditCard } from 'lucide-react';
+import { Link, Type, Mail, Phone, MessageSquare, Wifi, Contact2, CreditCard, MapPin, Bitcoin, CalendarPlus } from 'lucide-react';
 
 interface DataSidebarProps {
   dataState: QRDataState;
@@ -16,6 +16,9 @@ const TYPES: { id: QRDataType; label: string; icon: React.ReactNode }[] = [
   { id: 'wifi', label: 'Wi-Fi', icon: <Wifi aria-hidden="true" /> },
   { id: 'vcard', label: 'นามบัตร', icon: <Contact2 aria-hidden="true" /> },
   { id: 'promptpay', label: 'พร้อมเพย์', icon: <CreditCard aria-hidden="true" /> },
+  { id: 'location', label: 'พิกัด(Map)', icon: <MapPin aria-hidden="true" /> },
+  { id: 'crypto', label: 'คริปโต', icon: <Bitcoin aria-hidden="true" /> },
+  { id: 'event', label: 'ตารางปฏิทิน', icon: <CalendarPlus aria-hidden="true" /> },
 ];
 
 export default function DataSidebar({ dataState, setDataState }: DataSidebarProps) {
@@ -165,6 +168,64 @@ export default function DataSidebar({ dataState, setDataState }: DataSidebarProp
             <div className="form-group">
               <label className="label" htmlFor="input-pp-amt">จำนวนเงิน (ใส่หรือไม่ใส่ก็ได้)</label>
               <input id="input-pp-amt" type="number" step="0.01" className="input" value={dataState.promptpay.amount} onChange={(e) => updateData('promptpay', e.target.value, 'amount')} placeholder="0.00" />
+            </div>
+          </>
+        )}
+
+        {dataState.type === 'location' && (
+          <>
+            <div className="form-group">
+              <label className="label" htmlFor="input-loc-lat">ละติจูด (Latitude)</label>
+              <input id="input-loc-lat" type="text" className="input" value={dataState.location.lat} onChange={(e) => updateData('location', e.target.value, 'lat')} placeholder="Ex: 13.7563" />
+            </div>
+            <div className="form-group">
+              <label className="label" htmlFor="input-loc-lng">ลองจิจูด (Longitude)</label>
+              <input id="input-loc-lng" type="text" className="input" value={dataState.location.lng} onChange={(e) => updateData('location', e.target.value, 'lng')} placeholder="Ex: 100.5018" />
+            </div>
+          </>
+        )}
+
+        {dataState.type === 'crypto' && (
+          <>
+            <div className="form-group">
+              <label className="label" htmlFor="input-crypto-coin">เหรียญ (Coin)</label>
+              <select id="input-crypto-coin" className="select" value={dataState.crypto.coin} onChange={(e) => updateData('crypto', e.target.value, 'coin')}>
+                <option value="bitcoin">Bitcoin (BTC)</option>
+                <option value="ethereum">Ethereum (ETH)</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label className="label" htmlFor="input-crypto-addr">ที่อยู่กระเป๋าเงิน (Wallet Address)</label>
+              <input id="input-crypto-addr" type="text" className="input" value={dataState.crypto.address} onChange={(e) => updateData('crypto', e.target.value, 'address')} />
+            </div>
+            <div className="form-group">
+              <label className="label" htmlFor="input-crypto-amt">จำนวน (Amount - Optional)</label>
+              <input id="input-crypto-amt" type="number" step="0.000001" className="input" value={dataState.crypto.amount} onChange={(e) => updateData('crypto', e.target.value, 'amount')} />
+            </div>
+          </>
+        )}
+
+        {dataState.type === 'event' && (
+          <>
+            <div className="form-group">
+              <label className="label" htmlFor="input-event-title">ชื่องาน/กิจกรรม (Title)</label>
+              <input id="input-event-title" type="text" className="input" value={dataState.event.title} onChange={(e) => updateData('event', e.target.value, 'title')} />
+            </div>
+            <div className="form-group">
+              <label className="label" htmlFor="input-event-loc">สถานที่ (Location)</label>
+              <input id="input-event-loc" type="text" className="input" value={dataState.event.location} onChange={(e) => updateData('event', e.target.value, 'location')} />
+            </div>
+            <div className="form-group">
+              <label className="label" htmlFor="input-event-start">เริ่มเวลา (Start)</label>
+              <input id="input-event-start" type="datetime-local" className="input" value={dataState.event.start} onChange={(e) => updateData('event', e.target.value, 'start')} />
+            </div>
+            <div className="form-group">
+              <label className="label" htmlFor="input-event-end">สิ้นสุดเวลา (End)</label>
+              <input id="input-event-end" type="datetime-local" className="input" value={dataState.event.end} onChange={(e) => updateData('event', e.target.value, 'end')} />
+            </div>
+            <div className="form-group">
+              <label className="label" htmlFor="input-event-desc">รายละเอียด (Description - Optional)</label>
+              <textarea id="input-event-desc" className="input" rows={2} value={dataState.event.description} onChange={(e) => updateData('event', e.target.value, 'description')} />
             </div>
           </>
         )}
