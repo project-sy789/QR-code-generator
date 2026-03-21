@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import QRCodeStyling, {
   type DotType,
   type CornerSquareType,
@@ -42,20 +42,16 @@ interface QRCodePreviewProps {
 }
 
 export default function QRCodePreview({ options }: QRCodePreviewProps) {
-  const ref = useRef<HTMLDivElement>(null);
+  const [imageUrl, setImageUrl] = useState<string>('');
   const qrCode = useRef<QRCodeStyling | null>(null);
 
   useEffect(() => {
-    // Re-instantiate when first loaded to prevent double render issue on react strict mode
     qrCode.current = new QRCodeStyling({
       ...options,
       width: 1024,
       height: 1024,
+      type: 'canvas'
     });
-    if (ref.current) {
-      ref.current.innerHTML = '';
-      qrCode.current.append(ref.current);
-    }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
@@ -65,6 +61,20 @@ export default function QRCodePreview({ options }: QRCodePreviewProps) {
       width: 1024,
       height: 1024,
     });
+    
+    let isMounted = true;
+    qrCode.current.getRawData('png').then((blob) => {
+      if (!isMounted || !blob) return;
+      const url = URL.createObjectURL(blob as Blob);
+      setImageUrl((prevUrl) => {
+        if (prevUrl) URL.revokeObjectURL(prevUrl);
+        return url;
+      });
+    });
+
+    return () => {
+      isMounted = false;
+    };
   }, [options]);
 
   const onDownloadClick = (extension: FileExtension) => {
@@ -80,8 +90,12 @@ export default function QRCodePreview({ options }: QRCodePreviewProps) {
       <div className="bg-orb bg-orb-1"></div>
       <div className="bg-orb bg-orb-2"></div>
 
-      <div className="qr-wrapper" aria-label="QR Code Output">
-        <div ref={ref} />
+      <div className="qr-wrapper" aria-label="QR Code Output" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        {imageUrl ? (
+          <img src={imageUrl} alt="QR Code" style={{ width: '100%', height: 'auto', display: 'block', borderRadius: '10px' }} draggable="true" />
+        ) : (
+          <div style={{ color: 'var(--text-muted)' }}>กำลังสร้าง QR Code...</div>
+        )}
       </div>
 
       <div className="action-buttons glass-panel" style={{ padding: '1rem', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
