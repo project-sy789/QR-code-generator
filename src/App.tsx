@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import DataSidebar from './components/DataSidebar';
 import StyleSidebar from './components/StyleSidebar';
 import QRCodePreview, { type QRCodeOptions } from './components/QRCodePreview';
+import SEOContent from './components/SEOContent';
 import { buildQRDataString, type QRDataState } from './utils/qrBuilders';
 
 const DEFAULT_DATA_STATE: QRDataState = {
@@ -120,6 +121,15 @@ function App() {
       >
         <QRCodePreview options={qrOptions} />
       </motion.aside>
+
+      <motion.div 
+        style={{ gridColumn: '1 / -1' }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ ...springTransition, delay: 0.3 }}
+      >
+        <SEOContent />
+      </motion.div>
     </div>
   );
 }
