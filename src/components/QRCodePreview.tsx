@@ -48,6 +48,7 @@ export default function QRCodePreview({ options }: QRCodePreviewProps) {
   useEffect(() => {
     qrCode.current = new QRCodeStyling({
       ...options,
+      qrOptions: { errorCorrectionLevel: options.errorCorrectionLevel },
       width: 1024,
       height: 1024,
       type: 'canvas'
@@ -58,6 +59,7 @@ export default function QRCodePreview({ options }: QRCodePreviewProps) {
     if (!qrCode.current) return;
     qrCode.current.update({
       ...options,
+      qrOptions: { errorCorrectionLevel: options.errorCorrectionLevel },
       width: 1024,
       height: 1024,
     });

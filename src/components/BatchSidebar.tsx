@@ -69,6 +69,7 @@ export default function BatchSidebar({ options }: BatchSidebarProps) {
       // Render without forcing 320 size, use the user's defined width/1024
       const qrStyling = new QRCodeStyling({
         ...options,
+        qrOptions: { errorCorrectionLevel: options.errorCorrectionLevel },
         width: 1024,
         height: 1024,
       });
