@@ -16,7 +16,8 @@ const DEFAULT_DATA_STATE: QRDataState = {
   phone: '',
   sms: { phone: '', message: '' },
   wifi: { ssid: '', password: '', encryption: 'WPA', hidden: false },
-  vcard: { firstName: '', lastName: '', phone: '', email: '', company: '', title: '', website: '' }
+  vcard: { firstName: '', lastName: '', phone: '', email: '', company: '', title: '', website: '' },
+  promptpay: { id: '', amount: '' }
 };
 
 const DEFAULT_QR_OPTIONS: QRCodeOptions = {

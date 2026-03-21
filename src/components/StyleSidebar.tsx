@@ -217,17 +217,30 @@ export default function StyleSidebar({ options, setOptions }: StyleSidebarProps)
       </div>
       
       {options.image && (
-        <div className="form-group">
-          <label className="label" htmlFor="logo-margin">ระยะห่างโลโก้ (Logo Margin)</label>
-          <input 
-            id="logo-margin"
-            type="range" min="0" max="20" 
-            value={options.imageOptions.margin} 
-            onChange={e => handleTypeChange(['imageOptions', 'margin'], parseInt(e.target.value))}
-            style={{ width: '100%', cursor: 'pointer' }}
-            aria-label="Logo Margin"
-          />
-        </div>
+        <>
+          <div className="form-group">
+            <label className="label" htmlFor="logo-size">ขนาดโลโก้ (Logo Size)</label>
+            <input 
+              id="logo-size"
+              type="range" min="0.1" max="0.8" step="0.05"
+              value={options.imageOptions.imageSize || 0.4} 
+              onChange={e => handleTypeChange(['imageOptions', 'imageSize'], parseFloat(e.target.value))}
+              style={{ width: '100%', cursor: 'pointer' }}
+              aria-label="Logo Size"
+            />
+          </div>
+          <div className="form-group">
+            <label className="label" htmlFor="logo-margin">กรอบพื้นหลังโลโก้ (Clear Background)</label>
+            <input 
+              id="logo-margin"
+              type="range" min="0" max="40" 
+              value={options.imageOptions.margin} 
+              onChange={e => handleTypeChange(['imageOptions', 'margin'], parseInt(e.target.value))}
+              style={{ width: '100%', cursor: 'pointer' }}
+              aria-label="Logo Margin"
+            />
+          </div>
+        </>
       )}
     </div>
   );

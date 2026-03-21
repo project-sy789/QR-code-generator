@@ -1,6 +1,6 @@
 import React from 'react';
 import type { QRDataState, QRDataType } from '../utils/qrBuilders';
-import { Link, Type, Mail, Phone, MessageSquare, Wifi, Contact2 } from 'lucide-react';
+import { Link, Type, Mail, Phone, MessageSquare, Wifi, Contact2, CreditCard } from 'lucide-react';
 
 interface DataSidebarProps {
   dataState: QRDataState;
@@ -15,6 +15,7 @@ const TYPES: { id: QRDataType; label: string; icon: React.ReactNode }[] = [
   { id: 'sms', label: 'SMS', icon: <MessageSquare aria-hidden="true" /> },
   { id: 'wifi', label: 'Wi-Fi', icon: <Wifi aria-hidden="true" /> },
   { id: 'vcard', label: 'นามบัตร', icon: <Contact2 aria-hidden="true" /> },
+  { id: 'promptpay', label: 'พร้อมเพย์', icon: <CreditCard aria-hidden="true" /> },
 ];
 
 export default function DataSidebar({ dataState, setDataState }: DataSidebarProps) {
@@ -151,6 +152,19 @@ export default function DataSidebar({ dataState, setDataState }: DataSidebarProp
             <div className="form-group">
               <label className="label" htmlFor="input-vc-email">อีเมล (Email)</label>
               <input id="input-vc-email" type="email" className="input" value={dataState.vcard.email} onChange={(e) => updateData('vcard', e.target.value, 'email')} />
+            </div>
+          </>
+        )}
+
+        {dataState.type === 'promptpay' && (
+          <>
+            <div className="form-group">
+              <label className="label" htmlFor="input-pp-id">รหัสพร้อมเพย์ (เบอร์โทร หรือ บัตรประชาชน)</label>
+              <input id="input-pp-id" type="tel" className="input" value={dataState.promptpay.id} onChange={(e) => updateData('promptpay', e.target.value, 'id')} placeholder="08xxxxxxxx หรือ 1xx..." />
+            </div>
+            <div className="form-group">
+              <label className="label" htmlFor="input-pp-amt">จำนวนเงิน (ใส่หรือไม่ใส่ก็ได้)</label>
+              <input id="input-pp-amt" type="number" step="0.01" className="input" value={dataState.promptpay.amount} onChange={(e) => updateData('promptpay', e.target.value, 'amount')} placeholder="0.00" />
             </div>
           </>
         )}

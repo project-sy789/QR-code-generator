@@ -33,6 +33,7 @@ export interface QRCodeOptions {
   imageOptions: {
     crossOrigin: string;
     margin: number;
+    imageSize?: number;
   };
 }
 
