@@ -48,8 +48,8 @@ export default function QRCodePreview({ options }: QRCodePreviewProps) {
     // Re-instantiate when first loaded to prevent double render issue on react strict mode
     qrCode.current = new QRCodeStyling({
       ...options,
-      width: 320,
-      height: 320,
+      width: 1024,
+      height: 1024,
     });
     if (ref.current) {
       ref.current.innerHTML = '';
@@ -61,8 +61,8 @@ export default function QRCodePreview({ options }: QRCodePreviewProps) {
     if (!qrCode.current) return;
     qrCode.current.update({
       ...options,
-      width: window.innerWidth < 600 ? 250 : 320,
-      height: window.innerWidth < 600 ? 250 : 320,
+      width: 1024,
+      height: 1024,
     });
   }, [options]);
 

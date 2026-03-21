@@ -20,8 +20,8 @@ const DEFAULT_DATA_STATE: QRDataState = {
 
 const DEFAULT_QR_OPTIONS: QRCodeOptions = {
   data: 'https://github.com/project-sy789/QR-code-generator',
-  width: 340,
-  height: 340,
+  width: 1024,
+  height: 1024,
   margin: 10,
   errorCorrectionLevel: 'M',
   dotsOptions: { color: '#000000', type: 'square' },
@@ -45,7 +45,7 @@ function App() {
   });
 
   const [qrOptions, setQrOptions] = useState<QRCodeOptions>(() => {
-    const saved = localStorage.getItem('qr-options');
+    const saved = localStorage.getItem('qr-options-v2');
     return saved ? JSON.parse(saved) : DEFAULT_QR_OPTIONS;
   });
 
@@ -70,7 +70,7 @@ function App() {
 
   // Sync options to Local Storage
   useEffect(() => {
-    localStorage.setItem('qr-options', JSON.stringify(qrOptions));
+    localStorage.setItem('qr-options-v2', JSON.stringify(qrOptions));
   }, [qrOptions]);
 
   const toggleTheme = () => {
