@@ -13,7 +13,7 @@ export interface QRDataState {
   vcard: { firstName: string; lastName: string; phone: string; email: string; company: string; title: string; website: string };
   promptpay: { id: string; amount: string };
   location: { lat: string; lng: string };
-  crypto: { coin: 'bitcoin' | 'ethereum'; address: string; amount: string };
+  crypto: { coin: string; address: string; amount: string };
   event: { title: string; location: string; start: string; end: string; description: string };
 }
 
@@ -41,13 +41,12 @@ export const buildQRDataString = (state: QRDataState): string => {
     case 'location':
       if (!state.location.lat || !state.location.lng) return 'geo:0,0';
       return `geo:${state.location.lat},${state.location.lng}`;
-    case 'crypto':
+    case 'crypto': {
       if (!state.crypto.address) return '';
-      if (state.crypto.coin === 'bitcoin') {
-        return state.crypto.amount ? `bitcoin:${state.crypto.address}?amount=${state.crypto.amount}` : `bitcoin:${state.crypto.address}`;
-      } else {
-        return state.crypto.amount ? `ethereum:${state.crypto.address}?value=${state.crypto.amount}` : `ethereum:${state.crypto.address}`;
-      }
+      const coin = state.crypto.coin || 'bitcoin';
+      const paramName = coin === 'ethereum' ? 'value' : 'amount';
+      return state.crypto.amount ? `${coin}:${state.crypto.address}?${paramName}=${state.crypto.amount}` : `${coin}:${state.crypto.address}`;
+    }
     case 'event': {
       const formatDT = (dt: string) => {
         if (!dt) return '';

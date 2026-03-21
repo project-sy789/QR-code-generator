@@ -192,6 +192,12 @@ export default function DataSidebar({ dataState, setDataState }: DataSidebarProp
               <select id="input-crypto-coin" className="select" value={dataState.crypto.coin} onChange={(e) => updateData('crypto', e.target.value, 'coin')}>
                 <option value="bitcoin">Bitcoin (BTC)</option>
                 <option value="ethereum">Ethereum (ETH)</option>
+                <option value="tether">Tether (USDT)</option>
+                <option value="binancecoin">Binance Coin (BNB)</option>
+                <option value="solana">Solana (SOL)</option>
+                <option value="cardano">Cardano (ADA)</option>
+                <option value="dogecoin">Dogecoin (DOGE)</option>
+                <option value="ripple">Ripple (XRP)</option>
               </select>
             </div>
             <div className="form-group">

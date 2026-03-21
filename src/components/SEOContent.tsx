@@ -20,7 +20,9 @@ export default function SEOContent() {
           <li style={{ marginBottom: '0.8rem' }}><strong>ความเป็นส่วนตัวสูงสุด (Privacy First) :</strong> การสร้าง QR Code ทั้งหมดเกิดขึ้นบนเครื่องคอมพิวเตอร์และมือถือของคุณเอง ไม่มีการส่งข้อมูลขึ้นเซิร์ฟเวอร์เพื่อให้ใครมาแอบดู</li>
           <li style={{ marginBottom: '0.8rem' }}><strong>ออกแบบสวยงามระดับพรีเมียม :</strong> ไม่ต้องทนกับ QR Code ขาวดำจืดชืด คุณสามารถปรับแต่งสีสันให้เข้ากับแบรนด์ และปรับรูปทรงขอบมุมให้ดูทันสมัยได้อย่างอิสระ</li>
           <li style={{ marginBottom: '0.8rem' }}><strong>ใส่โลโก้ตัวเองได้เลย :</strong> รองรับการนำโลโก้รานค้า หรือภาพโปรไฟล์มาวางตรงกลางรหัสเพื่อความน่าเชื่อถือที่มากขึ้น</li>
-          <li style={{ marginBottom: '0.8rem' }}><strong>รองรับข้อมูลทุกประเภท :</strong> ไม่ว่าจะเป็น URL เว็บไซต์, ไลน์, เบอร์โทรศัพท์, อีเมล, นามบัตร (vCard สำหรับเซฟคอนแทค), หรือรหัสผ่าน Wi-Fi เพื่อให้ลูกค้าสแกนต่อเน็ตหน้าร้าน</li>
+          <li style={{ marginBottom: '0.8rem' }}><strong>รองรับข้อมูลระดับองค์กร (Pro Types) :</strong> นอกเหนือจากลิงก์และเบอร์โทรทั่วไป เรายังรองรับการทำ QR รับโอนเงิน <strong>PromptPay</strong>, พิกัด <strong>Google Maps</strong>, งานอีเวนต์ <strong>Calendar (vEvent)</strong> และกระเป๋าคริปโต <strong>(BTC, ETH, USDT, SOL ฯลฯ)</strong></li>
+          <li style={{ marginBottom: '0.8rem' }}><strong>ระบบสร้างเยอะๆ (Batch Generator) :</strong> อัปโหลดไฟล์ตาราง Excel/CSV เพื่อทำ QR Code นับร้อยรูปออกมาเป็น ZIP พร้อมกันได้ในเสี้ยววินาที โดยไม่ทำให้เบราว์เซอร์ค้างล่ม</li>
+          <li style={{ marginBottom: '0.8rem' }}><strong>ติดตั้งแอปได้ (PWA Offline) :</strong> กด Install / Add to Home Screen เพื่อติดตั้งระบบนี้ลงเครื่อง ไว้เปิดใช้งานแบบ 100% ออฟไลน์ได้ทุกเมื่อที่ต้องการ</li>
         </ul>
 
         <h3 style={{ color: 'var(--text-main)', marginTop: '2rem', marginBottom: '1rem', fontSize: '1.2rem' }}>
