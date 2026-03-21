@@ -92,7 +92,7 @@ export default function QRCodePreview({ options }: QRCodePreviewProps) {
 
       <div className="qr-wrapper" aria-label="QR Code Output" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         {imageUrl ? (
-          <img src={imageUrl} alt="QR Code" style={{ width: '100%', height: 'auto', display: 'block', borderRadius: '10px' }} draggable="true" />
+          <img src={imageUrl} alt="QR Code" style={{ width: '100%', maxWidth: '380px', maxHeight: '380px', objectFit: 'contain', display: 'block', borderRadius: '10px', boxShadow: '0 8px 32px rgba(0,0,0,0.1)' }} draggable="true" />
         ) : (
           <div style={{ color: 'var(--text-muted)' }}>กำลังสร้าง QR Code...</div>
         )}
