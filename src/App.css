@@ -149,11 +149,33 @@
 
 @media (max-width: 900px) {
   .app-container {
-    grid-template-columns: 1fr;
-    height: auto;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1.5rem;
   }
   .sidebar {
     height: auto;
     overflow-y: visible;
+    order: 2;
+  }
+  .preview-area {
+    padding: 1rem;
+    order: 1;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .qr-wrapper {
+    padding: 1.2rem;
+  }
+  .main-header {
+    order: 0;
+  }
+  .main-header h1 {
+    font-size: 1.5rem;
+  }
+  .type-selector {
+    grid-template-columns: repeat(2, 1fr);
   }
 }

@@ -22,11 +22,11 @@ const DEFAULT_QR_OPTIONS: QRCodeOptions = {
   width: 340,
   height: 340,
   margin: 10,
-  errorCorrectionLevel: 'H',
-  dotsOptions: { color: '#ffffff', type: 'rounded' },
-  backgroundOptions: { color: '#1a1f2b' },
-  cornersSquareOptions: { color: '#6366f1', type: 'extra-rounded' },
-  cornersDotOptions: { color: '#ec4899', type: 'dot' },
+  errorCorrectionLevel: 'M',
+  dotsOptions: { color: '#000000', type: 'square' },
+  backgroundOptions: { color: '#ffffff' },
+  cornersSquareOptions: { color: '#000000', type: 'square' },
+  cornersDotOptions: { color: '#000000', type: 'square' },
   imageOptions: { crossOrigin: 'anonymous', margin: 10 }
 };
 
@@ -78,13 +78,13 @@ function App() {
       <header className="main-header" style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <QrCode className="header-icon" aria-hidden="true" />
-          <h1>Antigravity QR Generator</h1>
+          <h1>โปรแกรมสร้างคิวอาร์โค้ด</h1>
         </div>
         <button 
           className="btn btn-secondary" 
           onClick={toggleTheme} 
           aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-          title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          title={`เปลี่ยนสลับโหมดหน้าจอหลัก`}
           style={{ padding: '10px 14px', borderRadius: 'var(--radius-lg)' }}
         >
           {theme === 'dark' ? <Sun size={20} aria-label="Sun icon" /> : <Moon size={20} aria-label="Moon icon" />}

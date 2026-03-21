@@ -8,13 +8,13 @@ interface DataSidebarProps {
 }
 
 const TYPES: { id: QRDataType; label: string; icon: React.ReactNode }[] = [
-  { id: 'url', label: 'URL', icon: <Link aria-hidden="true" /> },
-  { id: 'text', label: 'Text', icon: <Type aria-hidden="true" /> },
-  { id: 'email', label: 'Email', icon: <Mail aria-hidden="true" /> },
-  { id: 'phone', label: 'Phone', icon: <Phone aria-hidden="true" /> },
+  { id: 'url', label: 'เว็บไซต์', icon: <Link aria-hidden="true" /> },
+  { id: 'text', label: 'ข้อความ', icon: <Type aria-hidden="true" /> },
+  { id: 'email', label: 'อีเมล', icon: <Mail aria-hidden="true" /> },
+  { id: 'phone', label: 'เบอร์โทร', icon: <Phone aria-hidden="true" /> },
   { id: 'sms', label: 'SMS', icon: <MessageSquare aria-hidden="true" /> },
   { id: 'wifi', label: 'Wi-Fi', icon: <Wifi aria-hidden="true" /> },
-  { id: 'vcard', label: 'vCard', icon: <Contact2 aria-hidden="true" /> },
+  { id: 'vcard', label: 'นามบัตร', icon: <Contact2 aria-hidden="true" /> },
 ];
 
 export default function DataSidebar({ dataState, setDataState }: DataSidebarProps) {
@@ -29,7 +29,7 @@ export default function DataSidebar({ dataState, setDataState }: DataSidebarProp
 
   return (
     <div className="control-section">
-      <h2 className="section-title"><Type size={20} aria-hidden="true" /> Content Data</h2>
+      <h2 className="section-title"><Type size={20} aria-hidden="true" /> ข้อมูลเนื้อหา (Content Data)</h2>
       
       <div className="type-selector" role="group" aria-label="Select Data Type">
         {TYPES.map(t => (
@@ -48,7 +48,7 @@ export default function DataSidebar({ dataState, setDataState }: DataSidebarProp
       <div className="form-container">
         {dataState.type === 'url' && (
           <div className="form-group">
-            <label className="label" htmlFor="input-url">Website URL</label>
+            <label className="label" htmlFor="input-url">ลิงก์เว็บไซต์ (URL)</label>
             <input 
               id="input-url" type="url" className="input" 
               value={dataState.url} onChange={(e) => updateData('url', e.target.value)}
@@ -59,11 +59,11 @@ export default function DataSidebar({ dataState, setDataState }: DataSidebarProp
 
         {dataState.type === 'text' && (
           <div className="form-group">
-            <label className="label" htmlFor="input-text">Plain Text</label>
+            <label className="label" htmlFor="input-text">ข้อความทั่วไป (Text)</label>
             <textarea 
               id="input-text" className="input" rows={4}
               value={dataState.text} onChange={(e) => updateData('text', e.target.value)}
-              placeholder="Enter your message here..."
+              placeholder="พิมพ์ข้อความของคุณที่นี่..."
             />
           </div>
         )}
@@ -71,15 +71,15 @@ export default function DataSidebar({ dataState, setDataState }: DataSidebarProp
         {dataState.type === 'email' && (
           <>
             <div className="form-group">
-              <label className="label" htmlFor="input-email-addr">Email Address</label>
+              <label className="label" htmlFor="input-email-addr">ที่อยู่อีเมล (Email)</label>
               <input id="input-email-addr" type="email" className="input" value={dataState.email.address} onChange={(e) => updateData('email', e.target.value, 'address')} />
             </div>
             <div className="form-group">
-              <label className="label" htmlFor="input-email-subj">Subject</label>
+              <label className="label" htmlFor="input-email-subj">หัวเรื่อง (Subject)</label>
               <input id="input-email-subj" type="text" className="input" value={dataState.email.subject} onChange={(e) => updateData('email', e.target.value, 'subject')} />
             </div>
             <div className="form-group">
-              <label className="label" htmlFor="input-email-body">Message Body</label>
+              <label className="label" htmlFor="input-email-body">รายละเอียดข้อความ</label>
               <textarea id="input-email-body" className="input" rows={3} value={dataState.email.body} onChange={(e) => updateData('email', e.target.value, 'body')} />
             </div>
           </>
@@ -87,19 +87,19 @@ export default function DataSidebar({ dataState, setDataState }: DataSidebarProp
 
         {dataState.type === 'phone' && (
           <div className="form-group">
-            <label className="label" htmlFor="input-phone">Phone Number</label>
-            <input id="input-phone" type="tel" className="input" value={dataState.phone} onChange={(e) => updateData('phone', e.target.value)} placeholder="+1234567890" />
+            <label className="label" htmlFor="input-phone">เบอร์โทรศัพท์ (Phone)</label>
+            <input id="input-phone" type="tel" className="input" value={dataState.phone} onChange={(e) => updateData('phone', e.target.value)} placeholder="08xxxxxxxx" />
           </div>
         )}
 
         {dataState.type === 'sms' && (
           <>
             <div className="form-group">
-              <label className="label" htmlFor="input-sms-phone">Phone Number</label>
+              <label className="label" htmlFor="input-sms-phone">เบอร์โทรศัพท์ปลายทาง</label>
               <input id="input-sms-phone" type="tel" className="input" value={dataState.sms.phone} onChange={(e) => updateData('sms', e.target.value, 'phone')} />
             </div>
             <div className="form-group">
-              <label className="label" htmlFor="input-sms-msg">Message</label>
+              <label className="label" htmlFor="input-sms-msg">ข้อความ SMS</label>
               <textarea id="input-sms-msg" className="input" rows={3} value={dataState.sms.message} onChange={(e) => updateData('sms', e.target.value, 'message')} />
             </div>
           </>
@@ -108,19 +108,19 @@ export default function DataSidebar({ dataState, setDataState }: DataSidebarProp
         {dataState.type === 'wifi' && (
           <>
             <div className="form-group">
-              <label className="label" htmlFor="input-wifi-ssid">Network Name (SSID)</label>
+              <label className="label" htmlFor="input-wifi-ssid">ชื่อ Wi-Fi (SSID)</label>
               <input id="input-wifi-ssid" type="text" className="input" value={dataState.wifi.ssid} onChange={(e) => updateData('wifi', e.target.value, 'ssid')} />
             </div>
             <div className="form-group">
-              <label className="label" htmlFor="input-wifi-pwd">Password</label>
+              <label className="label" htmlFor="input-wifi-pwd">รหัสผ่าน (Password)</label>
               <input id="input-wifi-pwd" type="password" className="input" value={dataState.wifi.password} onChange={(e) => updateData('wifi', e.target.value, 'password')} />
             </div>
             <div className="form-group">
-              <label className="label" htmlFor="input-wifi-enc">Encryption</label>
+              <label className="label" htmlFor="input-wifi-enc">ระบบรักษาความปลอดภัย (Encryption)</label>
               <select id="input-wifi-enc" className="select" value={dataState.wifi.encryption} onChange={(e) => updateData('wifi', e.target.value, 'encryption')}>
                 <option value="WPA">WPA/WPA2</option>
                 <option value="WEP">WEP</option>
-                <option value="nopass">None</option>
+                <option value="nopass">ไม่มีรหัสผ่าน (None)</option>
               </select>
             </div>
           </>
@@ -129,27 +129,27 @@ export default function DataSidebar({ dataState, setDataState }: DataSidebarProp
         {dataState.type === 'vcard' && (
           <>
             <div className="form-group">
-              <label className="label" htmlFor="input-vc-fname">First Name</label>
+              <label className="label" htmlFor="input-vc-fname">ชื่อ (First Name)</label>
               <input id="input-vc-fname" type="text" className="input" value={dataState.vcard.firstName} onChange={(e) => updateData('vcard', e.target.value, 'firstName')} />
             </div>
             <div className="form-group">
-              <label className="label" htmlFor="input-vc-lname">Last Name</label>
+              <label className="label" htmlFor="input-vc-lname">นามสกุล (Last Name)</label>
               <input id="input-vc-lname" type="text" className="input" value={dataState.vcard.lastName} onChange={(e) => updateData('vcard', e.target.value, 'lastName')} />
             </div>
             <div className="form-group">
-              <label className="label" htmlFor="input-vc-comp">Company</label>
+              <label className="label" htmlFor="input-vc-comp">บริษัท (Company)</label>
               <input id="input-vc-comp" type="text" className="input" value={dataState.vcard.company} onChange={(e) => updateData('vcard', e.target.value, 'company')} />
             </div>
             <div className="form-group">
-              <label className="label" htmlFor="input-vc-title">Title</label>
+              <label className="label" htmlFor="input-vc-title">ตำแหน่ง (Title)</label>
               <input id="input-vc-title" type="text" className="input" value={dataState.vcard.title} onChange={(e) => updateData('vcard', e.target.value, 'title')} />
             </div>
             <div className="form-group">
-              <label className="label" htmlFor="input-vc-phone">Phone</label>
+              <label className="label" htmlFor="input-vc-phone">เบอร์โทร (Phone)</label>
               <input id="input-vc-phone" type="tel" className="input" value={dataState.vcard.phone} onChange={(e) => updateData('vcard', e.target.value, 'phone')} />
             </div>
             <div className="form-group">
-              <label className="label" htmlFor="input-vc-email">Email</label>
+              <label className="label" htmlFor="input-vc-email">อีเมล (Email)</label>
               <input id="input-vc-email" type="email" className="input" value={dataState.vcard.email} onChange={(e) => updateData('vcard', e.target.value, 'email')} />
             </div>
           </>

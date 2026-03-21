@@ -6,7 +6,7 @@ import QRCodeStyling, {
   type ErrorCorrectionLevel,
   type FileExtension
 } from 'qr-code-styling';
-import { Download } from 'lucide-react';
+import { Download, CheckCircle2 } from 'lucide-react';
 
 export interface QRCodeOptions {
   data: string;
@@ -45,7 +45,12 @@ export default function QRCodePreview({ options }: QRCodePreviewProps) {
   const qrCode = useRef<QRCodeStyling | null>(null);
 
   useEffect(() => {
-    qrCode.current = new QRCodeStyling(options);
+    // Re-instantiate when first loaded to prevent double render issue on react strict mode
+    qrCode.current = new QRCodeStyling({
+      ...options,
+      width: 320,
+      height: 320,
+    });
     if (ref.current) {
       ref.current.innerHTML = '';
       qrCode.current.append(ref.current);
@@ -54,7 +59,11 @@ export default function QRCodePreview({ options }: QRCodePreviewProps) {
 
   useEffect(() => {
     if (!qrCode.current) return;
-    qrCode.current.update(options);
+    qrCode.current.update({
+      ...options,
+      width: window.innerWidth < 600 ? 250 : 320,
+      height: window.innerWidth < 600 ? 250 : 320,
+    });
   }, [options]);
 
   const onDownloadClick = (extension: FileExtension) => {
@@ -70,17 +79,23 @@ export default function QRCodePreview({ options }: QRCodePreviewProps) {
       <div className="bg-orb bg-orb-1"></div>
       <div className="bg-orb bg-orb-2"></div>
 
-      <div className="qr-wrapper">
+      <div className="qr-wrapper" aria-label="QR Code Output">
         <div ref={ref} />
       </div>
 
-      <div className="action-buttons glass-panel" style={{ padding: '1rem', borderRadius: '16px' }}>
-        <button className="btn" onClick={() => onDownloadClick('png')}>
-          <Download size={18} /> Download PNG
-        </button>
-        <button className="btn btn-secondary" onClick={() => onDownloadClick('svg')}>
-          <Download size={18} /> Download SVG
-        </button>
+      <div className="action-buttons glass-panel" style={{ padding: '1rem', borderRadius: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <h3 style={{ margin: 0, fontSize: '1rem', textAlign: 'center', color: 'var(--text-main)' }}>
+          <CheckCircle2 color="#10b981" size={18} style={{ verticalAlign: 'middle', marginRight: '6px' }} />
+          พร้อมดาวน์โหลด
+        </h3>
+        <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+          <button className="btn" onClick={() => onDownloadClick('png')}>
+            <Download size={18} aria-hidden="true" /> โหลด PNG
+          </button>
+          <button className="btn btn-secondary" onClick={() => onDownloadClick('svg')}>
+            <Download size={18} aria-hidden="true" /> โหลด SVG
+          </button>
+        </div>
       </div>
     </div>
   );

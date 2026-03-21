@@ -1,73 +1,25 @@
-# React + TypeScript + Vite
+# 📱 โปรแกรมสร้างคิวอาร์โค้ด (QR Code Generator) ฟรี!
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+สวัสดีครับ! นี่คือโปรแกรมสำหรับสร้าง QR Code แบบสวยงามที่มีให้คุณใช้งานแบบฟรีๆ ไม่มีโฆษณาคั่น สามารถเอาภาพไปใช้งานได้จริงทั้งในงานสิ่งพิมพ์และแชร์ลงโซเชียลมีเดีย 
 
-Currently, two official plugins are available:
+🔗 **ทางเข้าใช้งาน:** [คลิกเปิดโปรแกรมสร้างคิวอาร์โค้ดที่นี่](https://project-sy789.github.io/QR-code-generator/)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## 🌟 ทำไมต้องใช้โปรแกรมของเรา?
+- **ใช้งานฟรี 100%**: ไม่ต้องโหลดแอป ไม่ต้องสมัครสมาชิก เข้าเว็บแล้วใช้งานได้เลย
+- **สร้างคิวอาร์โค้ดได้ครบทุกแบบ**: ไม่ว่าจะเป็น ลิงก์เว็บไซต์, เบอร์โทรสำหรับกดโทรออก, อีเมล, รหัสเชื่อมต่อ Wi-Fi (แค่แสกนก็ต่อเน็ตเลย), หรือนามบัตร
+- **ปรับแต่งสีสันได้ตามใจชอบ**: เปลี่ยนสีพื้นหลัง สีกรอบ หรือรูปแบบจุดของคิวอาร์โค้ดได้อย่างอิสระ
+- **มีเทมเพลตสีสำเร็จรูป**: ถ้าไม่อยากแต่งสีเอง เรามีปุ่มให้กดเปลี่ยนสีแบบล้ำๆ ได้ในคลิกเดียว!
+- **ใส่โลโก้ของตัวเองตรงกลางได้**: เพิ่มความน่าเชื่อถือให้ร้านค้าหรือแบรนด์ของคุณด้วยรูปภาพโลโก้ไว้กลาง QR Code
+- **โหลดไฟล์เอาไปใช้ได้สะดวก**: กดปุ่มเดียวก็ได้ภาพ PNG ชัดๆ เอาไปใช้งานต่อได้ทันที
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## 📖 วิธีใช้งานง่ายๆ 
+1. **เลือกข้อมูลที่ต้องการ**: ดูเมนูส่วนบนสุด เลือกได้เลยว่าอยากให้สแกนแล้วเกิดอะไรขึ้น เช่น เปิดเว็บ หรือบันทึกเบอร์โทร
+2. **กรอกรายละเอียด**: พิมพ์ข้อมูลลงในช่องว่าง ภาพคิวอาร์โค้ดทางขวาหน้าจอจะเปลี่ยนตามข้อมูลใหม่แบบอัตโนมัติ!
+3. **ตกแต่งความสวยงาม**: เลื่อนลงมาที่เมนู "ปรับแต่งดีไซน์" เพื่อเปลี่ยนสี รูปทรง หรือจะกดปุ่มอัปโหลดรูปภาพเพื่อนำภาพมาวางไว้ตรงกลางคิวอาร์โค้ดก็ได้
+4. **โหลดนำไปใช้**: ตรวจสอบความถูกต้อง แล้วเลือกกดปุ่ม **ดาวน์โหลด PNG** แล้วนำไฟล์ภาพไปโพสต์ ส่งไลน์ หรือสั่งปริ้นต์ได้เลย!
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+✨ *เคล็ดลับ: หากคุณเพิ่มรูปโลโก้ไว้ตรงกลาง แนะนำให้เข้าไปเลือกระดับความแม่นยำ (Error Correction) ให้เป็นระดับสูงสุด "High (30%)" เพื่อให้ผู้ใช้สามารถเอามือถือมาสแกนได้ติดง่ายที่สุดครับ!*
