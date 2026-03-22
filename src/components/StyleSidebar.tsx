@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Palette, Grid, Image as ImageIcon, Zap } from 'lucide-react';
 import type { QRCodeOptions } from './QRCodePreview';
 
@@ -8,6 +8,15 @@ interface StyleSidebarProps {
 }
 
 export default function StyleSidebar({ options, setOptions }: StyleSidebarProps) {
+  const [customGrad1, setCustomGrad1] = useState('#ff00cc');
+  const [customGrad2, setCustomGrad2] = useState('#333399');
+
+  const handleCustomGradient = (c1: string, c2: string) => {
+    setCustomGrad1(c1);
+    setCustomGrad2(c2);
+    applyGradient(c1, c2);
+  };
+
   const handleColorChange = (path: string[], value: string) => {
     setOptions(prev => {
       const newOpts = JSON.parse(JSON.stringify(prev));
@@ -131,11 +140,31 @@ export default function StyleSidebar({ options, setOptions }: StyleSidebarProps)
         <Palette size={16} aria-hidden="true" /> เติมสีแบบไล่เฉด (Gradient)
       </h3>
       <div className="form-group" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-        <button className="btn btn-secondary" onClick={() => applyGradient('#ff00cc', '#333399')} style={{ padding: '6px 10px', fontSize: '0.85rem', background: 'linear-gradient(45deg, #ff00cc, #333399)', color: 'white', border: 'none' }}>Neon Pink</button>
-        <button className="btn btn-secondary" onClick={() => applyGradient('#00c6ff', '#0072ff')} style={{ padding: '6px 10px', fontSize: '0.85rem', background: 'linear-gradient(45deg, #00c6ff, #0072ff)', color: 'white', border: 'none' }}>Ocean Blue</button>
-        <button className="btn btn-secondary" onClick={() => applyGradient('#f12711', '#f5af19')} style={{ padding: '6px 10px', fontSize: '0.85rem', background: 'linear-gradient(45deg, #f12711, #f5af19)', color: 'white', border: 'none' }}>Sunset Glow</button>
-        <button className="btn btn-secondary" onClick={() => applyGradient('#11998e', '#38ef7d')} style={{ padding: '6px 10px', fontSize: '0.85rem', background: 'linear-gradient(45deg, #11998e, #38ef7d)', color: 'white', border: 'none' }}>Emerald</button>
+        <button className="btn btn-secondary" onClick={() => { applyGradient('#ff00cc', '#333399'); setCustomGrad1('#ff00cc'); setCustomGrad2('#333399'); }} style={{ padding: '6px 10px', fontSize: '0.85rem', background: 'linear-gradient(45deg, #ff00cc, #333399)', color: 'white', border: 'none' }}>Neon Pink</button>
+        <button className="btn btn-secondary" onClick={() => { applyGradient('#00c6ff', '#0072ff'); setCustomGrad1('#00c6ff'); setCustomGrad2('#0072ff'); }} style={{ padding: '6px 10px', fontSize: '0.85rem', background: 'linear-gradient(45deg, #00c6ff, #0072ff)', color: 'white', border: 'none' }}>Ocean Blue</button>
+        <button className="btn btn-secondary" onClick={() => { applyGradient('#f12711', '#f5af19'); setCustomGrad1('#f12711'); setCustomGrad2('#f5af19'); }} style={{ padding: '6px 10px', fontSize: '0.85rem', background: 'linear-gradient(45deg, #f12711, #f5af19)', color: 'white', border: 'none' }}>Sunset Glow</button>
+        <button className="btn btn-secondary" onClick={() => { applyGradient('#11998e', '#38ef7d'); setCustomGrad1('#11998e'); setCustomGrad2('#38ef7d'); }} style={{ padding: '6px 10px', fontSize: '0.85rem', background: 'linear-gradient(45deg, #11998e, #38ef7d)', color: 'white', border: 'none' }}>Emerald</button>
         <button className="btn btn-secondary" onClick={clearGradient} style={{ padding: '6px 10px', fontSize: '0.85rem' }}>ลบไล่เฉดสี</button>
+      </div>
+      <div className="form-group" style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '0.5rem' }}>
+        <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>ผสมคู่สีอิสระ:</span>
+        <div style={{ display: 'flex', alignItems: 'center', background: 'var(--input-bg)', padding: '2px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--input-border)' }}>
+          <input 
+            type="color" 
+            value={customGrad1} 
+            onChange={e => handleCustomGradient(e.target.value, customGrad2)}
+            style={{ width: '28px', height: '28px', padding: '0', border: 'none', borderRadius: '4px', cursor: 'pointer', background: 'transparent' }}
+          />
+        </div>
+        <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>ไปจนถึง</span>
+        <div style={{ display: 'flex', alignItems: 'center', background: 'var(--input-bg)', padding: '2px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--input-border)' }}>
+          <input 
+            type="color" 
+            value={customGrad2} 
+            onChange={e => handleCustomGradient(customGrad1, e.target.value)}
+            style={{ width: '28px', height: '28px', padding: '0', border: 'none', borderRadius: '4px', cursor: 'pointer', background: 'transparent' }}
+          />
+        </div>
       </div>
 
       {/* Colors */}
