@@ -68,22 +68,66 @@ function App() {
     localStorage.setItem('qr-theme', theme);
   }, [theme]);
 
+// Generate White Halo Programmatically
+const createHaloImageURL = (src: string, thickness: number = 20): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width + thickness * 2;
+      canvas.height = img.height + thickness * 2;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return reject('No context');
+
+      for (let angle = 0; angle < 360; angle += 10) {
+        const nx = Math.cos(angle * Math.PI / 180) * thickness;
+        const ny = Math.sin(angle * Math.PI / 180) * thickness;
+        ctx.drawImage(img, thickness + nx, thickness + ny, img.width, img.height);
+      }
+
+      ctx.globalCompositeOperation = 'source-in';
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.drawImage(img, thickness, thickness, img.width, img.height);
+
+      resolve(canvas.toDataURL('image/png'));
+    };
+    img.onerror = reject;
+    img.src = src;
+  });
+};
+
   // Sync data to QR string & Local Storage
   useEffect(() => {
     localStorage.setItem('qr-data-state-v4', JSON.stringify(dataState));
     const dataString = buildQRDataString(dataState);
     if (dataString) {
-      setQrOptions(prev => {
-        return { 
+      if (dataState.type === 'promptpay') {
+        createHaloImageURL(thaiQrLogo, 25).then(haloUrl => {
+          setQrOptions(prev => ({ 
+            ...prev, 
+            data: dataString,
+            qrType: dataState.type,
+            frameText: dataState.promptpay.accountName || undefined,
+            showBanner: dataState.type === 'promptpay' ? (dataState.promptpay.showBanner ?? true) : false,
+            image: haloUrl,
+            errorCorrectionLevel: 'M'
+          }));
+        });
+      } else {
+        setQrOptions(prev => ({ 
           ...prev, 
           data: dataString,
           qrType: dataState.type,
-          frameText: dataState.promptpay.accountName || undefined,
-          showBanner: dataState.type === 'promptpay' ? (dataState.promptpay.showBanner ?? true) : false,
-          image: dataState.type === 'promptpay' ? thaiQrLogo : (prev.image === thaiQrLogo ? undefined : prev.image),
-          errorCorrectionLevel: dataState.type === 'promptpay' ? 'M' : prev.errorCorrectionLevel
-        };
-      });
+          frameText: undefined,
+          showBanner: false,
+          image: prev.image && prev.image.startsWith('data:image') ? undefined : prev.image, // Wipe our injected halo if they switch modes
+          errorCorrectionLevel: prev.errorCorrectionLevel
+        }));
+      }
     }
   }, [dataState]);
 
