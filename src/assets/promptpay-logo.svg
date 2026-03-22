@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 100">
+  <rect width="240" height="100" rx="10" fill="white"/>
+  <rect x="5" y="5" width="230" height="90" rx="6" fill="white" stroke="#103566" stroke-width="4"/>
+  <text x="120" y="38" font-family="sans-serif" font-weight="bold" font-size="22" fill="#103566" text-anchor="middle">พร้อมเพย์</text>
+  <rect x="15" y="48" width="210" height="40" rx="4" fill="#103566"/>
+  <text x="120" y="76" font-family="Arial, sans-serif" font-weight="bold" font-size="26" fill="white" text-anchor="middle">PromptPay</text>
+</svg>
