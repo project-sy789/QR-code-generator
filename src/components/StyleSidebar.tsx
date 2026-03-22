@@ -77,9 +77,9 @@ export default function StyleSidebar({ options, setOptions }: StyleSidebarProps)
   const clearGradient = () => {
     setOptions(prev => {
       const newOpts = JSON.parse(JSON.stringify(prev));
-      delete newOpts.dotsOptions.gradient;
-      delete newOpts.cornersSquareOptions.gradient;
-      delete newOpts.cornersDotOptions.gradient;
+      newOpts.dotsOptions.gradient = null;
+      newOpts.cornersSquareOptions.gradient = null;
+      newOpts.cornersDotOptions.gradient = null;
       return newOpts;
     });
   };
