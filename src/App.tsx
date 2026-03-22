@@ -9,6 +9,7 @@ import QRCodePreview, { type QRCodeOptions } from './components/QRCodePreview';
 import SEOContent from './components/SEOContent';
 import { buildQRDataString, type QRDataState } from './utils/qrBuilders';
 import thaiQrLogo from './assets/Thai_QR_Payment_Logo/Thai QR/Thai_QR_Payment_Logo-03.png';
+import thaiQrLogoBw from './assets/Thai_QR_Payment_Logo/Thai QR/Thai_QR_Payment_Logo-06.png';
 
 const DEFAULT_DATA_STATE: QRDataState = {
   type: 'url',
@@ -80,7 +81,8 @@ function App() {
           qrType: dataState.type,
           frameText: dataState.promptpay.accountName || undefined,
           showBanner: dataState.type === 'promptpay' ? (dataState.promptpay.showBanner ?? true) : false,
-          image: dataState.type === 'promptpay' ? thaiQrLogo : (prev.image === thaiQrLogo ? undefined : prev.image),
+          monochrome: dataState.type === 'promptpay' ? (dataState.promptpay.monochrome ?? false) : false,
+          image: dataState.type === 'promptpay' ? (dataState.promptpay.monochrome ? thaiQrLogoBw : thaiQrLogo) : (prev.image === thaiQrLogo || prev.image === thaiQrLogoBw ? undefined : prev.image),
           errorCorrectionLevel: dataState.type === 'promptpay' ? 'M' : prev.errorCorrectionLevel
         };
       });

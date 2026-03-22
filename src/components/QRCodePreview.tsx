@@ -9,6 +9,8 @@ import QRCodeStyling, {
 import { Download, CheckCircle2 } from 'lucide-react';
 import thaiQrLogo3 from '../assets/Thai_QR_Payment_Logo/Thai QR/Thai_QR_Payment_Logo-03.png';
 import promptPayLogo2 from '../assets/Thai_QR_Payment_Logo/Thai QR/PromptPay2.png';
+import thaiQrLogo6 from '../assets/Thai_QR_Payment_Logo/Thai QR/Thai_QR_Payment_Logo-06.png';
+import promptPayLogo1 from '../assets/Thai_QR_Payment_Logo/Thai QR/PromptPay1.png';
 
 export interface QRCodeOptions {
   data: string;
@@ -44,6 +46,7 @@ export interface QRCodeOptions {
   qrType?: string;
   frameText?: string;
   showBanner?: boolean;
+  monochrome?: boolean;
 }
 
 interface QRCodePreviewProps {
@@ -153,8 +156,8 @@ export default function QRCodePreview({ options }: QRCodePreviewProps) {
         ppImg.onload = tryDraw;
         
         qrImg.src = objUrl;
-        tqImg.src = thaiQrLogo3;
-        ppImg.src = promptPayLogo2;
+        tqImg.src = options.monochrome ? thaiQrLogo6 : thaiQrLogo3;
+        ppImg.src = options.monochrome ? promptPayLogo1 : promptPayLogo2;
       } else {
         setImageUrl((prevUrl) => {
           if (prevUrl) URL.revokeObjectURL(prevUrl);
