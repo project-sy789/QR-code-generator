@@ -54,5 +54,5 @@ export default defineConfig({
       }
     })
   ],
-  base: '/QR-code-generator/',
+  base: '/',
 })
