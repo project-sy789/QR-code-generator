@@ -8,6 +8,7 @@ import BatchSidebar from './components/BatchSidebar';
 import QRCodePreview, { type QRCodeOptions } from './components/QRCodePreview';
 import SEOContent from './components/SEOContent';
 import { buildQRDataString, type QRDataState } from './utils/qrBuilders';
+import promptpayLogo from './assets/promptpay-logo.svg';
 
 const DEFAULT_DATA_STATE: QRDataState = {
   type: 'url',
@@ -80,6 +81,23 @@ function App() {
   useEffect(() => {
     localStorage.setItem('qr-options-v2', JSON.stringify(qrOptions));
   }, [qrOptions]);
+
+  // Auto-embed PromptPay logo
+  useEffect(() => {
+    if (dataState.type === 'promptpay' && !qrOptions.image) {
+      setQrOptions(prev => ({ 
+        ...prev, 
+        image: promptpayLogo, 
+        errorCorrectionLevel: 'H' 
+      }));
+    } else if (dataState.type !== 'promptpay' && qrOptions.image === promptpayLogo) {
+      setQrOptions(prev => ({ 
+        ...prev, 
+        image: undefined,
+        errorCorrectionLevel: 'M'
+      }));
+    }
+  }, [dataState.type]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggleTheme = () => {
     setTheme(prev => prev === 'dark' ? 'light' : 'dark');
