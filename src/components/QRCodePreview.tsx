@@ -7,6 +7,8 @@ import QRCodeStyling, {
   type FileExtension
 } from 'qr-code-styling';
 import { Download, CheckCircle2 } from 'lucide-react';
+import thaiQrLogo6 from '../assets/Thai_QR_Payment_Logo/Thai QR/Thai_QR_Payment_Logo-06.png';
+import promptPayLogo1 from '../assets/Thai_QR_Payment_Logo/Thai QR/PromptPay1.png';
 
 export interface QRCodeOptions {
   data: string;
@@ -38,7 +40,9 @@ export interface QRCodeOptions {
     margin: number;
     imageSize?: number;
   };
+  qrType?: string;
   frameText?: string;
+  showBanner?: boolean;
 }
 
 interface QRCodePreviewProps {
@@ -73,17 +77,25 @@ export default function QRCodePreview({ options }: QRCodePreviewProps) {
       if (!isMounted || !blob) return;
       const objUrl = URL.createObjectURL(blob as Blob);
       
-      if (options.frameText) {
-        const img = new Image();
-        img.onload = () => {
+      if (options.showBanner) {
+        const qrImg = new Image();
+        const tqImg = new Image();
+        const ppImg = new Image();
+        let loaded = 0;
+        
+        const tryDraw = () => {
+          loaded++;
+          if (loaded < 3) return;
           URL.revokeObjectURL(objUrl);
+
           const canvas = document.createElement('canvas');
           const ctx = canvas.getContext('2d');
           if (!ctx) return;
           
           const qrSize = 1024;
-          const topBannerHeight = 280;
-          const bottomFooterHeight = 200;
+          const topBannerHeight = 320;
+          const bottomFooterHeight = options.frameText ? 160 : 0;
+          
           canvas.width = qrSize;
           canvas.height = qrSize + topBannerHeight + bottomFooterHeight;
 
@@ -93,40 +105,37 @@ export default function QRCodePreview({ options }: QRCodePreviewProps) {
 
           // Top Header (Dark Blue)
           ctx.fillStyle = '#103566';
-          ctx.fillRect(0, 0, canvas.width, 160);
+          ctx.fillRect(0, 0, canvas.width, 180);
+
+          // Draw Thai QR Symbol (Q) inside blue banner
+          // Original size: 355x261
+          ctx.drawImage(tqImg, 180, 40, 136, 100);
 
           // Top Text THAI QR PAYMENT
           ctx.fillStyle = '#ffffff';
-          ctx.font = 'bold 75px sans-serif';
-          ctx.textAlign = 'center';
-          ctx.fillText('THAI QR PAYMENT', canvas.width / 2, 105);
+          ctx.font = 'bold 60px "Helvetica Neue", Helvetica, Arial, sans-serif';
+          ctx.textAlign = 'left';
+          ctx.fillText('THAI QR PAYMENT', 340, 115);
 
-          // PromptPay Logo Replica Box
-          ctx.fillStyle = '#ffffff';
-          ctx.fillRect(canvas.width / 2 - 200, 120, 400, 110);
-          ctx.strokeStyle = '#103566';
-          ctx.lineWidth = 6;
-          ctx.strokeRect(canvas.width / 2 - 200, 120, 400, 110);
-          
-          ctx.fillStyle = '#103566';
-          ctx.font = 'bold 36px sans-serif';
-          ctx.fillText('พร้อมเพย์', canvas.width / 2, 165);
-          ctx.font = 'bold 44px sans-serif';
-          ctx.fillText('PromptPay', canvas.width / 2, 215);
+          // Draw PromptPay Logo inside white subspace
+          // Original size: 384x129 (~2.97:1 ratio). Desired height 100 -> width 297.
+          ctx.drawImage(ppImg, canvas.width / 2 - 148, 200, 297, 100);
 
-          // QR Code Border
+          // QR Code Inner Border
           ctx.strokeStyle = '#e2e8f0';
           ctx.lineWidth = 4;
           ctx.strokeRect(50, topBannerHeight + 50, qrSize - 100, qrSize - 100);
 
           // Draw QR Code Image
-          ctx.drawImage(img, 0, topBannerHeight);
+          ctx.drawImage(qrImg, 0, topBannerHeight);
 
           // Footer Text (Account Name)
-          ctx.fillStyle = '#103566';
-          ctx.font = 'bold 50px sans-serif';
-          ctx.textAlign = 'center';
-          ctx.fillText('ชื่อบัญชี : ' + options.frameText, canvas.width / 2, topBannerHeight + qrSize + 110);
+          if (options.frameText) {
+             ctx.fillStyle = '#103566';
+             ctx.font = 'bold 50px "Prompt", sans-serif';
+             ctx.textAlign = 'center';
+             ctx.fillText('ชื่อบัญชี : ' + options.frameText, canvas.width / 2, topBannerHeight + qrSize + 90);
+          }
 
           canvas.toBlob((compositeBlob) => {
             if (!compositeBlob) return;
@@ -137,7 +146,14 @@ export default function QRCodePreview({ options }: QRCodePreviewProps) {
             });
           }, 'image/png');
         };
-        img.src = objUrl;
+
+        qrImg.onload = tryDraw;
+        tqImg.onload = tryDraw;
+        ppImg.onload = tryDraw;
+        
+        qrImg.src = objUrl;
+        tqImg.src = thaiQrLogo6;
+        ppImg.src = promptPayLogo1;
       } else {
         setImageUrl((prevUrl) => {
           if (prevUrl) URL.revokeObjectURL(prevUrl);

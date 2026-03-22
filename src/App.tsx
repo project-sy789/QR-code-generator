@@ -8,6 +8,7 @@ import BatchSidebar from './components/BatchSidebar';
 import QRCodePreview, { type QRCodeOptions } from './components/QRCodePreview';
 import SEOContent from './components/SEOContent';
 import { buildQRDataString, type QRDataState } from './utils/qrBuilders';
+import thaiQrLogo from './assets/Thai_QR_Payment_Logo/Thai QR/Thai_QR_Payment_Logo-06.png';
 
 const DEFAULT_DATA_STATE: QRDataState = {
   type: 'url',
@@ -34,7 +35,7 @@ const DEFAULT_QR_OPTIONS: QRCodeOptions = {
   backgroundOptions: { color: '#ffffff' },
   cornersSquareOptions: { color: '#000000', type: 'square' },
   cornersDotOptions: { color: '#000000', type: 'square' },
-  imageOptions: { crossOrigin: 'anonymous', margin: 10 }
+  imageOptions: { crossOrigin: 'anonymous', margin: 10, imageSize: 0.25 }
 };
 
 // Easing definition for an Apple-like smooth spring/ease
@@ -73,14 +74,14 @@ function App() {
     const dataString = buildQRDataString(dataState);
     if (dataString) {
       setQrOptions(prev => {
-        // We purge the embedded image manually when switching off PromptPay (if it somehow lingered),
-        // or just rely entirely on user manual uploads from StyleSidebar.
         return { 
           ...prev, 
           data: dataString,
           qrType: dataState.type,
           frameText: dataState.promptpay.accountName || undefined,
-          showBanner: dataState.type === 'promptpay' ? (dataState.promptpay.showBanner ?? true) : false
+          showBanner: dataState.type === 'promptpay' ? (dataState.promptpay.showBanner ?? true) : false,
+          image: dataState.type === 'promptpay' ? thaiQrLogo : (prev.image === thaiQrLogo ? undefined : prev.image),
+          errorCorrectionLevel: dataState.type === 'promptpay' ? 'M' : prev.errorCorrectionLevel
         };
       });
     }
