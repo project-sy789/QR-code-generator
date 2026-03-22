@@ -1,6 +1,6 @@
 import React from 'react';
 import type { QRDataState, QRDataType } from '../utils/qrBuilders';
-import { Link, Type, Mail, Phone, MessageSquare, Wifi, Contact2, CreditCard, MapPin, Bitcoin, CalendarPlus, CheckCircle2 } from 'lucide-react';
+import { Link, Type, Mail, Phone, MessageSquare, Wifi, Contact2, CreditCard, MapPin, Bitcoin, CalendarPlus } from 'lucide-react';
 
 interface DataSidebarProps {
   dataState: QRDataState;
@@ -173,17 +173,27 @@ export default function DataSidebar({ dataState, setDataState }: DataSidebarProp
               <label className="label" htmlFor="input-pp-acc">ชื่อบัญชี (แสดงผลบนป้ายสแกน)</label>
               <input id="input-pp-acc" type="text" className="input" value={dataState.promptpay.accountName || ''} onChange={(e) => updateData('promptpay', e.target.value, 'accountName')} placeholder="เช่น นาย สมชาย ใจดี" />
             </div>
-            <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', marginTop: '12px' }} onClick={() => updateData('promptpay', !(dataState.promptpay.showBanner ?? true), 'showBanner')}>
-              <div className={`checkbox ${dataState.promptpay.showBanner !== false ? 'checked' : ''}`}>
-                {dataState.promptpay.showBanner !== false && <CheckCircle2 size={14} color="#fff" />}
-              </div>
-              <label style={{ margin: 0, cursor: 'pointer' }}>แสดงป้ายตั้งโต๊ะ (Merchant Banner)</label>
+            <div className="form-group" style={{ marginTop: '12px' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', userSelect: 'none' }}>
+                <input 
+                  type="checkbox" 
+                  checked={dataState.promptpay.showBanner !== false} 
+                  onChange={(e) => updateData('promptpay', e.target.checked, 'showBanner')} 
+                  style={{ width: '18px', height: '18px', accentColor: '#10b981', cursor: 'pointer' }}
+                />
+                <span style={{ fontSize: '0.95rem', color: 'var(--text-main)' }}>แสดงป้ายตั้งโต๊ะ (Merchant Banner)</span>
+              </label>
             </div>
-            <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', marginTop: '8px' }} onClick={() => updateData('promptpay', !dataState.promptpay.monochrome, 'monochrome')}>
-              <div className={`checkbox ${dataState.promptpay.monochrome ? 'checked' : ''}`}>
-                {dataState.promptpay.monochrome && <CheckCircle2 size={14} color="#fff" />}
-              </div>
-              <label style={{ margin: 0, cursor: 'pointer' }}>รูปแบบขาว-ดำ (Monochrome)</label>
+            <div className="form-group" style={{ marginTop: '8px' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', userSelect: 'none' }}>
+                <input 
+                  type="checkbox" 
+                  checked={!!dataState.promptpay.monochrome} 
+                  onChange={(e) => updateData('promptpay', e.target.checked, 'monochrome')} 
+                  style={{ width: '18px', height: '18px', accentColor: '#10b981', cursor: 'pointer' }}
+                />
+                <span style={{ fontSize: '0.95rem', color: 'var(--text-main)' }}>รูปแบบขาว-ดำ (Monochrome)</span>
+              </label>
             </div>
           </>
         )}
