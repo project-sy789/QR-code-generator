@@ -49,6 +49,32 @@ export default function StyleSidebar({ options, setOptions }: StyleSidebarProps)
     setOptions(prev => ({ ...prev, image: undefined }));
   };
 
+  const applyGradient = (color1: string, color2: string) => {
+    setOptions(prev => {
+      const grad = {
+        type: 'linear',
+        rotation: 0.785398, // 45 degrees
+        colorStops: [{ offset: 0, color: color1 }, { offset: 1, color: color2 }]
+      };
+      return {
+        ...prev,
+        dotsOptions: { ...prev.dotsOptions, gradient: grad },
+        cornersSquareOptions: { ...prev.cornersSquareOptions, gradient: grad },
+        cornersDotOptions: { ...prev.cornersDotOptions, gradient: grad }
+      };
+    });
+  };
+
+  const clearGradient = () => {
+    setOptions(prev => {
+      const newOpts = JSON.parse(JSON.stringify(prev));
+      delete newOpts.dotsOptions.gradient;
+      delete newOpts.cornersSquareOptions.gradient;
+      delete newOpts.cornersDotOptions.gradient;
+      return newOpts;
+    });
+  };
+
   const applyPreset = (preset: 'cyberpunk' | 'minimal' | 'corporate' | 'standard') => {
     if (preset === 'cyberpunk') {
       setOptions(prev => ({
@@ -100,8 +126,20 @@ export default function StyleSidebar({ options, setOptions }: StyleSidebarProps)
         <button className="btn btn-secondary" onClick={() => applyPreset('corporate')} style={{ padding: '6px 10px', fontSize: '0.85rem' }}>องค์กร (Corporate)</button>
       </div>
 
+      {/* Gradient Colors */}
+      <h3 className="label" style={{ marginTop: '1.5rem', color: 'var(--text-main)', display: 'flex', alignItems:'center', gap: '6px' }}>
+        <Palette size={16} aria-hidden="true" /> เติมสีแบบไล่เฉด (Gradient)
+      </h3>
+      <div className="form-group" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+        <button className="btn btn-secondary" onClick={() => applyGradient('#ff00cc', '#333399')} style={{ padding: '6px 10px', fontSize: '0.85rem', background: 'linear-gradient(45deg, #ff00cc, #333399)', color: 'white', border: 'none' }}>Neon Pink</button>
+        <button className="btn btn-secondary" onClick={() => applyGradient('#00c6ff', '#0072ff')} style={{ padding: '6px 10px', fontSize: '0.85rem', background: 'linear-gradient(45deg, #00c6ff, #0072ff)', color: 'white', border: 'none' }}>Ocean Blue</button>
+        <button className="btn btn-secondary" onClick={() => applyGradient('#f12711', '#f5af19')} style={{ padding: '6px 10px', fontSize: '0.85rem', background: 'linear-gradient(45deg, #f12711, #f5af19)', color: 'white', border: 'none' }}>Sunset Glow</button>
+        <button className="btn btn-secondary" onClick={() => applyGradient('#11998e', '#38ef7d')} style={{ padding: '6px 10px', fontSize: '0.85rem', background: 'linear-gradient(45deg, #11998e, #38ef7d)', color: 'white', border: 'none' }}>Emerald</button>
+        <button className="btn btn-secondary" onClick={clearGradient} style={{ padding: '6px 10px', fontSize: '0.85rem' }}>ลบไล่เฉดสี</button>
+      </div>
+
       {/* Colors */}
-      <h3 className="label" style={{ marginTop: '1.5rem', color: 'var(--text-main)' }}>สีสัน (Colors)</h3>
+      <h3 className="label" style={{ marginTop: '1.5rem', color: 'var(--text-main)' }}>สีสันปกติ (Solid Colors)</h3>
       <div className="form-group" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
         <div>
           <label className="label" htmlFor="color-dots">สีจุด (Dots Color)</label>

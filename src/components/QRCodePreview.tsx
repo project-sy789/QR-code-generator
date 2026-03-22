@@ -18,6 +18,7 @@ export interface QRCodeOptions {
   dotsOptions: {
     color: string;
     type: DotType;
+    gradient?: any;
   };
   backgroundOptions: {
     color: string;
@@ -25,10 +26,12 @@ export interface QRCodeOptions {
   cornersSquareOptions: {
     color: string;
     type: CornerSquareType;
+    gradient?: any;
   };
   cornersDotOptions: {
     color: string;
     type: CornerDotType;
+    gradient?: any;
   };
   imageOptions: {
     crossOrigin: string;
