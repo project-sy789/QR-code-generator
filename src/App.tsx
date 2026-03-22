@@ -8,7 +8,7 @@ import BatchSidebar from './components/BatchSidebar';
 import QRCodePreview, { type QRCodeOptions } from './components/QRCodePreview';
 import SEOContent from './components/SEOContent';
 import { buildQRDataString, type QRDataState } from './utils/qrBuilders';
-import thaiQrLogo from './assets/Thai_QR_Payment_Logo/Thai QR/Thai_QR_Payment_Logo-06.png';
+import thaiQrLogo from './assets/Thai_QR_Payment_Logo/Thai QR/Thai_QR_Payment_Logo-03.png';
 
 const DEFAULT_DATA_STATE: QRDataState = {
   type: 'url',
@@ -35,7 +35,7 @@ const DEFAULT_QR_OPTIONS: QRCodeOptions = {
   backgroundOptions: { color: '#ffffff' },
   cornersSquareOptions: { color: '#000000', type: 'square' },
   cornersDotOptions: { color: '#000000', type: 'square' },
-  imageOptions: { crossOrigin: 'anonymous', margin: 10, imageSize: 0.25 }
+  imageOptions: { crossOrigin: 'anonymous', margin: 0, imageSize: 0.25, hideBackgroundDots: false }
 };
 
 // Easing definition for an Apple-like smooth spring/ease
