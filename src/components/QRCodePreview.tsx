@@ -7,8 +7,8 @@ import QRCodeStyling, {
   type FileExtension
 } from 'qr-code-styling';
 import { Download, CheckCircle2 } from 'lucide-react';
-import thaiQrLogo3 from '../assets/Thai_QR_Payment_Logo/Thai QR/Thai_QR_Payment_Logo-03.png';
-import promptPayLogo1 from '../assets/Thai_QR_Payment_Logo/Thai QR/PromptPay1.png';
+import thaiQrLogo3 from '../assets/thai-qr-logo.svg';
+import promptPayLogo1 from '../assets/promptpay-logo.svg';
 
 export interface QRCodeOptions {
   data: string;
