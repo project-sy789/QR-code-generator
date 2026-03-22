@@ -19,7 +19,7 @@ const DEFAULT_DATA_STATE: QRDataState = {
   sms: { phone: '', message: '' },
   wifi: { ssid: '', password: '', encryption: 'WPA', hidden: false },
   vcard: { firstName: '', lastName: '', phone: '', email: '', company: '', title: '', website: '' },
-  promptpay: { id: '', amount: '' },
+  promptpay: { id: '', amount: '', accountName: '' },
   location: { lat: '', lng: '' },
   crypto: { coin: 'bitcoin', address: '', amount: '' },
   event: { title: '', location: '', start: '', end: '', description: '' }
@@ -73,7 +73,11 @@ function App() {
     localStorage.setItem('qr-data-state-v4', JSON.stringify(dataState));
     const dataString = buildQRDataString(dataState);
     if (dataString) {
-      setQrOptions(prev => ({ ...prev, data: dataString }));
+      setQrOptions(prev => ({ 
+        ...prev, 
+        data: dataString,
+        frameText: dataState.type === 'promptpay' && dataState.promptpay.accountName ? dataState.promptpay.accountName : undefined
+      }));
     }
   }, [dataState]);
 

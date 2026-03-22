@@ -38,6 +38,7 @@ export interface QRCodeOptions {
     margin: number;
     imageSize?: number;
   };
+  frameText?: string;
 }
 
 interface QRCodePreviewProps {
@@ -70,11 +71,79 @@ export default function QRCodePreview({ options }: QRCodePreviewProps) {
     let isMounted = true;
     qrCode.current.getRawData('png').then((blob) => {
       if (!isMounted || !blob) return;
-      const url = URL.createObjectURL(blob as Blob);
-      setImageUrl((prevUrl) => {
-        if (prevUrl) URL.revokeObjectURL(prevUrl);
-        return url;
-      });
+      const objUrl = URL.createObjectURL(blob as Blob);
+      
+      if (options.frameText) {
+        const img = new Image();
+        img.onload = () => {
+          URL.revokeObjectURL(objUrl);
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          if (!ctx) return;
+          
+          const qrSize = 1024;
+          const topBannerHeight = 280;
+          const bottomFooterHeight = 200;
+          canvas.width = qrSize;
+          canvas.height = qrSize + topBannerHeight + bottomFooterHeight;
+
+          // Fill White Background
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+          // Top Header (Dark Blue)
+          ctx.fillStyle = '#103566';
+          ctx.fillRect(0, 0, canvas.width, 160);
+
+          // Top Text THAI QR PAYMENT
+          ctx.fillStyle = '#ffffff';
+          ctx.font = 'bold 75px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('THAI QR PAYMENT', canvas.width / 2, 105);
+
+          // PromptPay Logo Replica Box
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(canvas.width / 2 - 200, 120, 400, 110);
+          ctx.strokeStyle = '#103566';
+          ctx.lineWidth = 6;
+          ctx.strokeRect(canvas.width / 2 - 200, 120, 400, 110);
+          
+          ctx.fillStyle = '#103566';
+          ctx.font = 'bold 36px sans-serif';
+          ctx.fillText('พร้อมเพย์', canvas.width / 2, 165);
+          ctx.font = 'bold 44px sans-serif';
+          ctx.fillText('PromptPay', canvas.width / 2, 215);
+
+          // QR Code Border
+          ctx.strokeStyle = '#e2e8f0';
+          ctx.lineWidth = 4;
+          ctx.strokeRect(50, topBannerHeight + 50, qrSize - 100, qrSize - 100);
+
+          // Draw QR Code Image
+          ctx.drawImage(img, 0, topBannerHeight);
+
+          // Footer Text (Account Name)
+          ctx.fillStyle = '#103566';
+          ctx.font = 'bold 50px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('ชื่อบัญชี : ' + options.frameText, canvas.width / 2, topBannerHeight + qrSize + 110);
+
+          canvas.toBlob((compositeBlob) => {
+            if (!compositeBlob) return;
+            const url = URL.createObjectURL(compositeBlob);
+            setImageUrl((prevUrl) => {
+              if (prevUrl) URL.revokeObjectURL(prevUrl);
+              return url;
+            });
+          }, 'image/png');
+        };
+        img.src = objUrl;
+      } else {
+        setImageUrl((prevUrl) => {
+          if (prevUrl) URL.revokeObjectURL(prevUrl);
+          return objUrl;
+        });
+      }
     });
 
     return () => {
@@ -83,11 +152,20 @@ export default function QRCodePreview({ options }: QRCodePreviewProps) {
   }, [options]);
 
   const onDownloadClick = (extension: FileExtension) => {
-    if (!qrCode.current) return;
-    qrCode.current.download({
-      extension,
-      name: 'qr-code-pro'
-    });
+    if (extension === 'png' || extension === 'jpeg') {
+      const a = document.createElement('a');
+      a.href = imageUrl;
+      a.download = `qr-code-promptpay.${extension}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } else {
+      if (!qrCode.current) return;
+      qrCode.current.download({
+        extension,
+        name: 'qr-code-pro'
+      });
+    }
   };
 
   return (
