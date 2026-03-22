@@ -8,7 +8,7 @@ import BatchSidebar from './components/BatchSidebar';
 import QRCodePreview, { type QRCodeOptions } from './components/QRCodePreview';
 import SEOContent from './components/SEOContent';
 import { buildQRDataString, type QRDataState } from './utils/qrBuilders';
-import thaiQrLogo from './assets/Thai_QR_Payment_Logo/Thai QR/Thai_QR_Payment_Logo-03.png';
+import thaiQrLogo from './assets/thai-qr-logo.svg';
 
 const DEFAULT_DATA_STATE: QRDataState = {
   type: 'url',

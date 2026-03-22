@@ -109,18 +109,18 @@ export default function QRCodePreview({ options }: QRCodePreviewProps) {
           ctx.fillRect(0, 0, canvas.width, 180);
 
           // Draw Thai QR Symbol (Q) inside blue banner
-          // Original size: 355x261
-          ctx.drawImage(tqImg, 180, 40, 136, 100);
+          // SVG size: 240x240 (Square). Target height 100.
+          ctx.drawImage(tqImg, 180, 40, 100, 100);
 
           // Top Text THAI QR PAYMENT
           ctx.fillStyle = '#ffffff';
           ctx.font = 'bold 60px "Helvetica Neue", Helvetica, Arial, sans-serif';
           ctx.textAlign = 'left';
-          ctx.fillText('THAI QR PAYMENT', 340, 115);
+          ctx.fillText('THAI QR PAYMENT', 320, 115);
 
           // Draw PromptPay Logo inside white subspace
-          // Original size: 384x129 (~2.97:1 ratio). Desired height 100 -> width 297.
-          ctx.drawImage(ppImg, canvas.width / 2 - 148, 200, 297, 100);
+          // SVG size: 400x130 (~3.07:1 ratio). Target height 100 -> width 307.
+          ctx.drawImage(ppImg, canvas.width / 2 - 153, 200, 307, 100);
 
           // QR Code Inner Border
           ctx.strokeStyle = '#e2e8f0';

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+  <defs>
+    <mask id="crossMask">
+      <rect width="240" height="240" fill="white" />
+      <rect x="105" y="0" width="30" height="240" fill="black" />
+      <rect x="0" y="105" width="240" height="30" fill="black" />
+    </mask>
+  </defs>
+
+  <g stroke="white" stroke-width="24" stroke-linejoin="round" fill="white">
+     <rect x="40" y="40" width="160" height="160" rx="40" />
+     <polygon points="160,180 220,220 180,160" />
+  </g>
+
+  <g mask="url(#crossMask)">
+     <rect x="40" y="40" width="160" height="160" rx="30" fill="#103566"/>
+     <polyline points="120,200 120,120 200,120 200,160 220,220 160,200" fill="#419d9b" />
+  </g>
+</svg>
