@@ -11,7 +11,7 @@ export interface QRDataState {
   sms: { phone: string; message: string };
   wifi: { ssid: string; password: string; encryption: 'WPA' | 'WEP' | 'nopass'; hidden: boolean };
   vcard: { firstName: string; lastName: string; phone: string; email: string; company: string; title: string; website: string };
-  promptpay: { id: string; amount: string; accountName?: string };
+  promptpay: { id: string; amount: string; accountName?: string; showBanner?: boolean };
   location: { lat: string; lng: string };
   crypto: { coin: string; address: string; amount: string };
   event: { title: string; location: string; start: string; end: string; description: string };

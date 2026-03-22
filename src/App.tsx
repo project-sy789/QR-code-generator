@@ -8,7 +8,6 @@ import BatchSidebar from './components/BatchSidebar';
 import QRCodePreview, { type QRCodeOptions } from './components/QRCodePreview';
 import SEOContent from './components/SEOContent';
 import { buildQRDataString, type QRDataState } from './utils/qrBuilders';
-import promptpayLogo from './assets/promptpay-logo.svg';
 
 const DEFAULT_DATA_STATE: QRDataState = {
   type: 'url',
@@ -73,11 +72,17 @@ function App() {
     localStorage.setItem('qr-data-state-v4', JSON.stringify(dataState));
     const dataString = buildQRDataString(dataState);
     if (dataString) {
-      setQrOptions(prev => ({ 
-        ...prev, 
-        data: dataString,
-        frameText: dataState.type === 'promptpay' && dataState.promptpay.accountName ? dataState.promptpay.accountName : undefined
-      }));
+      setQrOptions(prev => {
+        // We purge the embedded image manually when switching off PromptPay (if it somehow lingered),
+        // or just rely entirely on user manual uploads from StyleSidebar.
+        return { 
+          ...prev, 
+          data: dataString,
+          qrType: dataState.type,
+          frameText: dataState.promptpay.accountName || undefined,
+          showBanner: dataState.type === 'promptpay' ? (dataState.promptpay.showBanner ?? true) : false
+        };
+      });
     }
   }, [dataState]);
 
@@ -85,23 +90,6 @@ function App() {
   useEffect(() => {
     localStorage.setItem('qr-options-v2', JSON.stringify(qrOptions));
   }, [qrOptions]);
-
-  // Auto-embed PromptPay logo
-  useEffect(() => {
-    if (dataState.type === 'promptpay' && !qrOptions.image) {
-      setQrOptions(prev => ({ 
-        ...prev, 
-        image: promptpayLogo, 
-        errorCorrectionLevel: 'H' 
-      }));
-    } else if (dataState.type !== 'promptpay' && qrOptions.image === promptpayLogo) {
-      setQrOptions(prev => ({ 
-        ...prev, 
-        image: undefined,
-        errorCorrectionLevel: 'M'
-      }));
-    }
-  }, [dataState.type]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggleTheme = () => {
     setTheme(prev => prev === 'dark' ? 'light' : 'dark');
