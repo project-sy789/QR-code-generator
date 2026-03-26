@@ -148,7 +148,7 @@ export default function ScannerSidebar({ onScanSuccess }: ScannerSidebarProps) {
           <Camera size={24} color="var(--primary)" />
           เครื่องสแกนคิวอาร์ (Scanner)
         </h2>
-        <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>หันกล้องเพื่อให้ระบบถอดรหัสอัตโนมัติ</p>
+        <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>หันกล้อง หรือ <b>ลากไฟล์รูปภาพมาวาง</b> เพื่อสแกน</p>
       </div>
 
       <div style={{ display: 'flex', gap: '8px' }}>
@@ -188,6 +188,32 @@ export default function ScannerSidebar({ onScanSuccess }: ScannerSidebarProps) {
         }}
       >
         <div id="reader" style={{ width: '100%', border: 'none', opacity: isDragging ? 0.2 : 1, transition: 'opacity 0.2s ease' }}></div>
+        
+        {/* Persistent subtle indicator that you can drop items */}
+        {!isDragging && (
+          <div style={{
+            position: 'absolute',
+            bottom: '12px', left: '0', right: '0',
+            textAlign: 'center',
+            pointerEvents: 'none',
+            zIndex: 5
+          }}>
+            <span style={{
+              background: 'rgba(0,0,0,0.6)',
+              color: 'rgba(255,255,255,0.9)',
+              padding: '6px 14px',
+              borderRadius: '20px',
+              fontSize: '0.8rem',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+              backdropFilter: 'blur(4px)'
+            }}>
+              <ImageIcon size={14} /> สามารถลากรูปภาพมาวางได้ (Drag & Drop)
+            </span>
+          </div>
+        )}
         
         {isDragging && (
           <div style={{
