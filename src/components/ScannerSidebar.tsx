@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Html5QrcodeScanner, Html5QrcodeScanType } from 'html5-qrcode';
-import { Camera, RefreshCcw } from 'lucide-react';
+import { Camera, RefreshCcw, Image as ImageIcon } from 'lucide-react';
 
 interface ScannerSidebarProps {
   onScanSuccess: (decodedText: string) => void;
@@ -89,6 +89,7 @@ export default function ScannerSidebar({ onScanSuccess }: ScannerSidebarProps) {
     if (isSwapping) return;
     setIsSwapping(true);
     
+    // First safely halt the physical driver if it exists
     if (scannerRef.current) {
       try {
         await scannerRef.current.clear();
@@ -101,6 +102,32 @@ export default function ScannerSidebar({ onScanSuccess }: ScannerSidebarProps) {
     setTimeout(() => setIsSwapping(false), 500);
   };
 
+  const handleUploadTrigger = () => {
+    setIsSwapping(true);
+    const stopBtn = document.getElementById('html5-qrcode-button-camera-stop');
+    if (stopBtn) stopBtn.click(); // Shut down live feed
+
+    // Asynchronously poll for the fallback GUI
+    let attempts = 0;
+    const poller = setInterval(() => {
+      attempts++;
+      if (attempts > 50) { clearInterval(poller); setIsSwapping(false); return; }
+      
+      const swapLink = document.getElementById('reader__dashboard_section_swaplink');
+      if (swapLink && swapLink.innerText.includes('Image File')) {
+         clearInterval(poller);
+         swapLink.click(); // Bridge directly to the native React uploader node
+         setIsSwapping(false);
+         // Erase cached auto-starts so camera reliably re-boots if they click 'Camera Scan' again
+         document.getElementById('html5-qrcode-button-camera-start')?.removeAttribute('data-auto-clicked');
+         document.getElementById('html5-qrcode-button-camera-permission')?.removeAttribute('data-auto-clicked');
+      } else if (swapLink && swapLink.innerText.includes('Camera Scan')) {
+         clearInterval(poller);
+         setIsSwapping(false); // They were already browsing files
+      }
+    }, 50);
+  };
+
   return (
     <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
       <div style={{ textAlign: 'center' }}>
@@ -111,15 +138,27 @@ export default function ScannerSidebar({ onScanSuccess }: ScannerSidebarProps) {
         <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>หันกล้องเพื่อให้ระบบถอดรหัสอัตโนมัติ</p>
       </div>
 
-      <button 
-        className="btn" 
-        onClick={handleSwapCamera}
-        disabled={isSwapping}
-        style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-color)', color: 'var(--text-main)', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', cursor: isSwapping ? 'not-allowed' : 'pointer' }}
-      >
-        <RefreshCcw size={20} className={isSwapping ? "spin-anim" : ""} />
-        {isSwapping ? 'กำลังสลับกล้อง...' : `🔄 สลับไปใช้กล้อง${cameraMode === 'environment' ? 'หน้า (Front)' : 'หลัง (Back)'}`}
-      </button>
+      <div style={{ display: 'flex', gap: '8px' }}>
+        <button 
+          className="btn" 
+          onClick={handleSwapCamera}
+          disabled={isSwapping}
+          style={{ flex: 1, padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-color)', color: 'var(--text-main)', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', cursor: isSwapping ? 'not-allowed' : 'pointer' }}
+        >
+          <RefreshCcw size={18} className={isSwapping ? "spin-anim" : ""} />
+          {isSwapping ? 'รอสักครู่...' : `กล้อง${cameraMode === 'environment' ? 'หน้า' : 'หลัง'}`}
+        </button>
+
+        <button 
+          className="btn btn-secondary" 
+          onClick={handleUploadTrigger}
+          disabled={isSwapping}
+          style={{ flex: 1, padding: '12px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', cursor: isSwapping ? 'not-allowed' : 'pointer' }}
+        >
+          <ImageIcon size={18} />
+          อัปโหลดรูป
+        </button>
+      </div>
 
       <div style={{
           background: 'var(--input-bg)',
