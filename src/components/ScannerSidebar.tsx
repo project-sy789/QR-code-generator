@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Html5QrcodeScanner, Html5QrcodeScanType } from 'html5-qrcode';
+import { Html5QrcodeScanner, Html5QrcodeScanType, Html5Qrcode } from 'html5-qrcode';
 import { Camera, RefreshCcw, Image as ImageIcon } from 'lucide-react';
 
 interface ScannerSidebarProps {
@@ -8,6 +8,7 @@ interface ScannerSidebarProps {
 
 export default function ScannerSidebar({ onScanSuccess }: ScannerSidebarProps) {
   const scannerRef = useRef<Html5QrcodeScanner | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [cameraMode, setCameraMode] = useState<'environment' | 'user'>('environment');
   const [isSwapping, setIsSwapping] = useState(false);
 
@@ -18,7 +19,7 @@ export default function ScannerSidebar({ onScanSuccess }: ScannerSidebarProps) {
       fps: 10,
       qrbox: { width: 250, height: 250 },
       rememberLastUsedCamera: false, 
-      supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA, Html5QrcodeScanType.SCAN_TYPE_FILE],
+      supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA], // Native GUI only needs to handle Video stream
       videoConstraints: { facingMode: cameraMode }
     };
 
@@ -30,39 +31,19 @@ export default function ScannerSidebar({ onScanSuccess }: ScannerSidebarProps) {
       scanner.pause(true);
     }, () => {});
 
-    // Intelligent DOM Automation Bypass
+    // Intelligent DOM Automation Bypass - Directly executes hidden buttons
     const automateCore = () => {
       if (!isMounted) return;
-      const readerEl = document.getElementById('reader');
-      if (!readerEl) return;
-
-      // Nuke and Replace Ugly Texts
-      const walk = document.createTreeWalker(readerEl, NodeFilter.SHOW_TEXT, null);
-      let node;
-      while ((node = walk.nextNode())) {
-        if (node.nodeValue) {
-          const val = node.nodeValue.trim();
-          if (val.includes("Launching Camera") || val.match(/^Select Camera/)) {
-            node.nodeValue = ""; // Nuke loading labels and redundant dropdown tags
-          } else if (val === "Scan an Image File") {
-            node.nodeValue = "สแกนจากรูปภาพในเครื่อง (Image File)";
-          } else if (val === "Scan using camera directly") {
-            node.nodeValue = "สลับไปใช้กล้องสแกนสด (Camera Scan)";
-          } else if (val === "Or drop an image to scan") {
-            node.nodeValue = "หรือลากไฟล์ภาพมาปล่อยที่นี่";
-          }
-        }
-      }
 
       // Automatically bypass requirement for user clicks
       const permBtn = document.getElementById('html5-qrcode-button-camera-permission');
-      if (permBtn && permBtn.style.display !== 'none' && !permBtn.hasAttribute('data-auto-clicked')) {
+      if (permBtn && !permBtn.hasAttribute('data-auto-clicked')) {
         permBtn.setAttribute('data-auto-clicked', 'true');
         permBtn.click();
       }
 
       const startBtn = document.getElementById('html5-qrcode-button-camera-start');
-      if (startBtn && startBtn.style.display !== 'none' && !startBtn.hasAttribute('data-auto-clicked')) {
+      if (startBtn && !startBtn.hasAttribute('data-auto-clicked')) {
         startBtn.setAttribute('data-auto-clicked', 'true');
         setTimeout(() => { if (isMounted) startBtn.click(); }, 300);
       }
@@ -89,7 +70,6 @@ export default function ScannerSidebar({ onScanSuccess }: ScannerSidebarProps) {
     if (isSwapping) return;
     setIsSwapping(true);
     
-    // First safely halt the physical driver if it exists
     if (scannerRef.current) {
       try {
         await scannerRef.current.clear();
@@ -103,29 +83,28 @@ export default function ScannerSidebar({ onScanSuccess }: ScannerSidebarProps) {
   };
 
   const handleUploadTrigger = () => {
-    setIsSwapping(true);
-    const stopBtn = document.getElementById('html5-qrcode-button-camera-stop');
-    if (stopBtn) stopBtn.click(); // Shut down live feed
+    if (fileInputRef.current) {
+      fileInputRef.current.click(); // Spawns OS Native File Browser silently
+    }
+  };
 
-    // Asynchronously poll for the fallback GUI
-    let attempts = 0;
-    const poller = setInterval(() => {
-      attempts++;
-      if (attempts > 50) { clearInterval(poller); setIsSwapping(false); return; }
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const html5QrCode = new Html5Qrcode("fast-file-reader");
+      const text = await html5QrCode.scanFile(file, true);
+      onScanSuccess(text);
       
-      const swapLink = document.getElementById('reader__dashboard_section_swaplink');
-      if (swapLink && swapLink.innerText.includes('Image File')) {
-         clearInterval(poller);
-         swapLink.click(); // Bridge directly to the native React uploader node
-         setIsSwapping(false);
-         // Erase cached auto-starts so camera reliably re-boots if they click 'Camera Scan' again
-         document.getElementById('html5-qrcode-button-camera-start')?.removeAttribute('data-auto-clicked');
-         document.getElementById('html5-qrcode-button-camera-permission')?.removeAttribute('data-auto-clicked');
-      } else if (swapLink && swapLink.innerText.includes('Camera Scan')) {
-         clearInterval(poller);
-         setIsSwapping(false); // They were already browsing files
-      }
-    }, 50);
+      html5QrCode.clear();
+    } catch (err) {
+      alert("ไม่พบรหัส QR Code ในรูปภาพนี้ กรุณาลองใหม่ (No QR Code found)");
+      console.warn("File Decode Fallback Failed", err);
+    }
+    
+    // Reset file string to allow identical payload resubmissions
+    e.target.value = '';
   };
 
   return (
@@ -171,29 +150,21 @@ export default function ScannerSidebar({ onScanSuccess }: ScannerSidebarProps) {
         <div id="reader" style={{ width: '100%', border: 'none' }}></div>
       </div>
       
+      {/* Invisible anchor target for standalone image array decoder */}
+      <div id="fast-file-reader" style={{ position: 'absolute', visibility: 'hidden', width: '10px', height: '10px' }}></div>
+      <input 
+         type="file" 
+         accept="image/*" 
+         ref={fileInputRef} 
+         style={{ display: 'none' }} 
+         onChange={handleFileUpload} 
+      />
+      
       <style>{`
-        /* Nuke ugly OS-level native inputs from HTML5-QRCode */
-        #reader__camera_selection { display: none !important; }
-        #html5-qrcode-button-camera-stop { display: none !important; }
-        #reader__dashboard_section_csr span { display: none !important; }
-        #reader { border: none !important; }
+        /* Eradicate everything but the raw video viewer generated by HTML5-QRCode */
+        #reader__dashboard_section_csr { display: none !important; }
         
-        /* Format remaining dashboard controls for Image fallback */
-        #reader__dashboard_section_csr button, #reader__dashboard_section_swaplink {
-          background-color: var(--primary) !important;
-          color: white !important;
-          border: none !important;
-          padding: 8px 16px !important;
-          border-radius: var(--radius-md) !important;
-          cursor: pointer !important;
-          margin: 4px !important;
-          font-family: 'Prompt', sans-serif !important;
-          text-decoration: none !important;
-          display: inline-block !important;
-        }
-        #reader__dashboard_section_csr button:hover, #reader__dashboard_section_swaplink:hover {
-          opacity: 0.9 !important;
-        }
+        #reader { border: none !important; }
         
         /* Spin animation for Swap Camera UX */
         .spin-anim {
