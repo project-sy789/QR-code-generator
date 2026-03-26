@@ -8,6 +8,8 @@ interface ScannerSidebarProps {
 
 export default function ScannerSidebar({ onScanSuccess }: ScannerSidebarProps) {
   const scannerRef = useRef<Html5QrcodeScanner | null>(null);
+  const autoStartedPermissionRef = useRef(false);
+  const autoStartedEngineRef = useRef(false);
 
   useEffect(() => {
     // Initialize Scanner on Mount
@@ -89,6 +91,72 @@ export default function ScannerSidebar({ onScanSuccess }: ScannerSidebarProps) {
              opt.text = `กล้อง ${index} (Camera)`;
           }
         });
+      }
+
+      // Auto-Start Hook Execution
+      const permissionBtn = document.getElementById('html5-qrcode-button-camera-permission');
+      if (permissionBtn && permissionBtn.style.display !== 'none' && !autoStartedPermissionRef.current) {
+        autoStartedPermissionRef.current = true;
+        permissionBtn.click();
+      }
+
+      const startBtn = document.getElementById('html5-qrcode-button-camera-start');
+      if (startBtn && startBtn.style.display !== 'none' && !autoStartedEngineRef.current) {
+        autoStartedEngineRef.current = true;
+        // Delay slightly for physical driver handshake stability
+        setTimeout(() => startBtn.click(), 250);
+      }
+
+      // Seamless Swap Camera Injection Router
+      const stopBtn = document.getElementById('html5-qrcode-button-camera-stop');
+      if (stopBtn && stopBtn.style.display !== 'none') {
+        let customSwapBtn = document.getElementById('custom-camera-swap-btn');
+        if (!customSwapBtn) {
+          customSwapBtn = document.createElement('button');
+          customSwapBtn.id = 'custom-camera-swap-btn';
+          customSwapBtn.innerHTML = '🔄 สลับหน้า/หลัง (Swap)';
+          customSwapBtn.style.backgroundColor = '#f59e0b';
+          customSwapBtn.style.color = 'white';
+          customSwapBtn.style.border = 'none';
+          customSwapBtn.style.padding = '8px 16px';
+          customSwapBtn.style.borderRadius = 'var(--radius-md)';
+          customSwapBtn.style.cursor = 'pointer';
+          customSwapBtn.style.marginLeft = '8px';
+          customSwapBtn.style.fontFamily = "'Prompt', sans-serif";
+          customSwapBtn.style.fontWeight = "bold";
+
+          customSwapBtn.onclick = () => {
+            stopBtn.click();
+            if (customSwapBtn) customSwapBtn.remove();
+            
+            // Allow UI breakdown duration
+            const repoll = setInterval(() => {
+              const activeSelect = document.getElementById('reader__camera_selection') as HTMLSelectElement;
+              const activeStart = document.getElementById('html5-qrcode-button-camera-start');
+              
+              if (activeSelect && activeStart) {
+                 clearInterval(repoll);
+                 const currentIdx = activeSelect.selectedIndex;
+                 let nextIdx = (currentIdx + 1) % activeSelect.options.length;
+
+                 // Iterate rapidly over ignored duplicates until hitting the next logical OS layer
+                 for (let attempts = 0; attempts < activeSelect.options.length; attempts++) {
+                    if (activeSelect.options[nextIdx].style.display !== 'none' && activeSelect.options[nextIdx].value !== '') {
+                      break;
+                    }
+                    nextIdx = (nextIdx + 1) % activeSelect.options.length;
+                 }
+                 
+                 activeSelect.selectedIndex = nextIdx;
+                 activeSelect.dispatchEvent(new Event('change'));
+                 // Engage Engine directly on the newly active port
+                 setTimeout(() => document.getElementById('html5-qrcode-button-camera-start')?.click(), 300);
+              }
+            }, 100);
+          };
+          
+          stopBtn.parentNode?.insertBefore(customSwapBtn, stopBtn.nextSibling);
+        }
       }
     };
 
