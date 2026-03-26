@@ -43,6 +43,17 @@ export default function SEOContent() {
       </motion.div>
 
       <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={fadeInUp}>
+        <div style={{ background: 'var(--input-bg)', padding: '1.5rem', borderRadius: 'var(--radius-lg)', border: '1px solid var(--primary-glow)', marginBottom: '2rem' }}>
+          <h3 style={{ color: 'var(--text-main)', marginBottom: '1rem', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '1.4rem' }}>📸</span> ฟีเจอร์ใหม่! เครื่องสแกนคิวอาร์โค้ดอัจฉริยะ (Native Scanner)
+          </h3>
+          <p style={{ color: 'var(--text-muted)', lineHeight: '1.8', fontSize: '1rem' }}>
+            ไม่เพียงแค่สร้าง แต่คุณสามารถ <strong>สแกน QR Code (Scan)</strong> ผ่านเว็บของเราได้ทันที! ระบบสแกนเนอร์ถูกออกแบบมาให้ทำงานรวดเร็วระดับแอปพลิเคชัน (Native-like) รองรับการสลับกล้องหน้า/หลังแบบไร้รอยต่อ และไม้ตายสำคัญสำหรับผู้ใช้คอมพิวเตอร์คือฟีเจอร์ <strong>ลากแล้ววาง (Drag & Drop)</strong> เพียงแค่ลากไฟล์รูปภาพมาปล่อยลงบนหน้าจอ ระบบจะถอดรหัสข้อความออกมาให้คุณก็อปปี้หรือเปิดลิงก์ต่อได้ทันที โดยข้อมูลทั้งหมดจะถูกประมวลผลอยู่แค่ในเครื่องของคุณเท่านั้น (Client-side Privacy) ปลอดภัย 100%
+          </p>
+        </div>
+      </motion.div>
+
+      <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} variants={fadeInUp}>
         <h3 style={{ color: 'var(--text-main)', marginBottom: '1rem', fontSize: '1.2rem' }}>
           💡 เคล็ดลับการทำ QR Code ให้น่าสแกนและสแกนติดไว
         </h3>
