@@ -170,7 +170,7 @@ function App() {
         transition={{ ...springTransition, delay: 0.2 }}
       >
         {appMode === 'scan' ? (
-          <ScannerResultPreview scannedResult={scannedResult} />
+          <ScannerResultPreview scannedResult={scannedResult} onReset={() => setScannedResult(null)} />
         ) : (
           <QRCodePreview options={qrOptions} />
         )}

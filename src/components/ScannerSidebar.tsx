@@ -15,7 +15,8 @@ export default function ScannerSidebar({ onScanSuccess }: ScannerSidebarProps) {
       fps: 10,
       qrbox: { width: 250, height: 250 },
       rememberLastUsedCamera: true,
-      supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA, Html5QrcodeScanType.SCAN_TYPE_FILE]
+      supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA, Html5QrcodeScanType.SCAN_TYPE_FILE],
+      videoConstraints: { facingMode: "environment" }
     };
 
     const scanner = new Html5QrcodeScanner("reader", config, false);
@@ -23,14 +24,47 @@ export default function ScannerSidebar({ onScanSuccess }: ScannerSidebarProps) {
 
     scanner.render((decodedText) => {
       onScanSuccess(decodedText);
-      // Optional: Pause scanner on success 
-      // scanner.pause();
+      // Automatically pause scanner to prevent continuous scanning spam over the result screen
+      scanner.pause(true);
     }, () => {
       // Background scan errors (ignored natively)
     });
 
+    // Translation logic to brute-force Thai localization onto standard English UI elements
+    const translateUI = () => {
+      const texts: Record<string, string> = {
+        "Request Camera Permissions": "ขออนุญาตเปิดกล้อง (Camera)",
+        "Scan an Image File": "อัปโหลดรูปภาพที่นี่ (Image File)",
+        "Scan using camera directly": "สลับไปใช้กล้องสแกน (Camera)",
+        "Start Scanning": "เปิดกล้องสแกน (Start)",
+        "Stop Scanning": "ปิดกล้องสแกน (Stop)",
+        "Or drop an image to scan": "หรือลากไฟล์ภาพลงมาที่นี่"
+      };
+
+      const readerElement = document.getElementById('reader');
+      if (!readerElement) return;
+
+      const walk = document.createTreeWalker(readerElement, NodeFilter.SHOW_TEXT, null);
+      let node;
+      while ((node = walk.nextNode())) {
+        if (node.nodeValue) {
+          const val = node.nodeValue.trim();
+          if (texts[val]) {
+            node.nodeValue = node.nodeValue.replace(val, texts[val]);
+          }
+        }
+      }
+    };
+
+    const observer = new MutationObserver(translateUI);
+    const targetNode = document.getElementById('reader');
+    if (targetNode) {
+      observer.observe(targetNode, { childList: true, subtree: true });
+      translateUI(); // Initial translation sweep
+    }
+
     return () => {
-      // Cleanup on Unmount
+      if (observer) observer.disconnect();
       if (scannerRef.current) {
         scannerRef.current.clear().catch(error => {
           console.error("Failed to clear html5QrcodeScanner. ", error);
@@ -73,6 +107,8 @@ export default function ScannerSidebar({ onScanSuccess }: ScannerSidebarProps) {
           cursor: pointer !important;
           margin: 4px !important;
           font-family: 'Prompt', sans-serif !important;
+          text-decoration: none !important;
+          display: inline-block !important;
         }
         #reader__dashboard_section_csr button:hover, #reader__dashboard_section_swaplink:hover {
           opacity: 0.9 !important;

@@ -4,9 +4,10 @@ import { motion } from 'framer-motion';
 
 interface ScannerResultPreviewProps {
   scannedResult: string | null;
+  onReset: () => void;
 }
 
-export default function ScannerResultPreview({ scannedResult }: ScannerResultPreviewProps) {
+export default function ScannerResultPreview({ scannedResult, onReset }: ScannerResultPreviewProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
@@ -90,6 +91,14 @@ export default function ScannerResultPreview({ scannedResult }: ScannerResultPre
               </a>
             )}
           </div>
+
+          <button 
+            className="btn" 
+            onClick={onReset}
+            style={{ width: '100%', padding: '12px', background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-main)' }}
+          >
+            สแกนคิวอาร์โค้ดใหม่ (Scan Again)
+          </button>
         </motion.div>
       )}
 
