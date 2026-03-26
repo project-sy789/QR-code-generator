@@ -1,6 +1,6 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Html5QrcodeScanner, Html5QrcodeScanType } from 'html5-qrcode';
-import { Camera } from 'lucide-react';
+import { Camera, RefreshCcw } from 'lucide-react';
 
 interface ScannerSidebarProps {
   onScanSuccess: (decodedText: string) => void;
@@ -8,17 +8,18 @@ interface ScannerSidebarProps {
 
 export default function ScannerSidebar({ onScanSuccess }: ScannerSidebarProps) {
   const scannerRef = useRef<Html5QrcodeScanner | null>(null);
-  const autoStartedPermissionRef = useRef(false);
-  const autoStartedEngineRef = useRef(false);
+  const [cameraMode, setCameraMode] = useState<'environment' | 'user'>('environment');
+  const [isSwapping, setIsSwapping] = useState(false);
 
   useEffect(() => {
-    // Initialize Scanner on Mount
+    let isMounted = true;
+
     const config = {
       fps: 10,
       qrbox: { width: 250, height: 250 },
-      rememberLastUsedCamera: true,
+      rememberLastUsedCamera: false, 
       supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA, Html5QrcodeScanType.SCAN_TYPE_FILE],
-      videoConstraints: { facingMode: "environment" }
+      videoConstraints: { facingMode: cameraMode }
     };
 
     const scanner = new Html5QrcodeScanner("reader", config, false);
@@ -26,166 +27,99 @@ export default function ScannerSidebar({ onScanSuccess }: ScannerSidebarProps) {
 
     scanner.render((decodedText) => {
       onScanSuccess(decodedText);
-      // Automatically pause scanner to prevent continuous scanning spam over the result screen
       scanner.pause(true);
-    }, () => {
-      // Background scan errors (ignored natively)
-    });
+    }, () => {});
 
-    // Translation logic to brute-force Thai localization onto standard English UI elements
-    const translateUI = () => {
-      const texts: Record<string, string> = {
-        "Request Camera Permissions": "ขออนุญาตเปิดกล้อง (Camera)",
-        "Scan an Image File": "อัปโหลดรูปภาพที่นี่ (Image File)",
-        "Scan using camera directly": "สลับไปใช้กล้องสแกน (Camera)",
-        "Start Scanning": "เปิดกล้องสแกน (Start)",
-        "Stop Scanning": "ปิดกล้องสแกน (Stop)",
-        "Or drop an image to scan": "หรือลากไฟล์ภาพลงมาที่นี่"
-      };
+    // Intelligent DOM Automation Bypass
+    const automateCore = () => {
+      if (!isMounted) return;
+      const readerEl = document.getElementById('reader');
+      if (!readerEl) return;
 
-      const readerElement = document.getElementById('reader');
-      if (!readerElement) return;
-
-      const walk = document.createTreeWalker(readerElement, NodeFilter.SHOW_TEXT, null);
+      // Nuke and Replace Ugly Texts
+      const walk = document.createTreeWalker(readerEl, NodeFilter.SHOW_TEXT, null);
       let node;
       while ((node = walk.nextNode())) {
         if (node.nodeValue) {
           const val = node.nodeValue.trim();
-          if (texts[val]) {
-            node.nodeValue = node.nodeValue.replace(val, texts[val]);
-          } else if (val.match(/^Select Camera \(\d+\)$/)) {
-            node.nodeValue = "สลับกล้อง (Select Camera)";
+          if (val.includes("Launching Camera") || val.match(/^Select Camera/)) {
+            node.nodeValue = ""; // Nuke loading labels and redundant dropdown tags
+          } else if (val === "Scan an Image File") {
+            node.nodeValue = "สแกนจากรูปภาพในเครื่อง (Image File)";
+          } else if (val === "Scan using camera directly") {
+            node.nodeValue = "สลับไปใช้กล้องสแกนสด (Camera Scan)";
+          } else if (val === "Or drop an image to scan") {
+            node.nodeValue = "หรือลากไฟล์ภาพมาปล่อยที่นี่";
           }
         }
       }
 
-      const cameraSelect = document.getElementById('reader__camera_selection') as HTMLSelectElement;
-      if (cameraSelect) {
-        let hasFront = false;
-        let hasBack = false;
-
-        Array.from(cameraSelect.options).forEach((opt, index) => {
-          if (!opt.value) return; 
-
-          const label = opt.text.toLowerCase();
-          const isFront = label.includes('front') || label.includes('face') || label.includes('user');
-          const isBack = label.includes('back') || label.includes('rear') || label.includes('environment') || label.includes('0') || label.includes('1') || label.includes('2');
-
-          if (isFront) {
-            if (!hasFront) {
-              opt.text = "📷 กล้องหน้า (Front Camera)";
-              opt.style.display = "block";
-              hasFront = true;
-            } else {
-              opt.style.display = "none";
-            }
-          } else if (isBack) {
-            if (!hasBack) {
-              opt.text = "📸 กล้องหลัง (Back Camera)";
-              opt.style.display = "block";
-              hasBack = true;
-            } else {
-              opt.style.display = "none";
-            }
-          } else {
-             opt.text = `กล้อง ${index} (Camera)`;
-          }
-        });
-      }
-
-      // Auto-Start Hook Execution
-      const permissionBtn = document.getElementById('html5-qrcode-button-camera-permission');
-      if (permissionBtn && permissionBtn.style.display !== 'none' && !autoStartedPermissionRef.current) {
-        autoStartedPermissionRef.current = true;
-        permissionBtn.click();
+      // Automatically bypass requirement for user clicks
+      const permBtn = document.getElementById('html5-qrcode-button-camera-permission');
+      if (permBtn && permBtn.style.display !== 'none' && !permBtn.hasAttribute('data-auto-clicked')) {
+        permBtn.setAttribute('data-auto-clicked', 'true');
+        permBtn.click();
       }
 
       const startBtn = document.getElementById('html5-qrcode-button-camera-start');
-      if (startBtn && startBtn.style.display !== 'none' && !autoStartedEngineRef.current) {
-        autoStartedEngineRef.current = true;
-        // Delay slightly for physical driver handshake stability
-        setTimeout(() => startBtn.click(), 250);
-      }
-
-      // Seamless Swap Camera Injection Router
-      const stopBtn = document.getElementById('html5-qrcode-button-camera-stop');
-      if (stopBtn && stopBtn.style.display !== 'none') {
-        let customSwapBtn = document.getElementById('custom-camera-swap-btn');
-        if (!customSwapBtn) {
-          customSwapBtn = document.createElement('button');
-          customSwapBtn.id = 'custom-camera-swap-btn';
-          customSwapBtn.innerHTML = '🔄 สลับหน้า/หลัง (Swap)';
-          customSwapBtn.style.backgroundColor = '#f59e0b';
-          customSwapBtn.style.color = 'white';
-          customSwapBtn.style.border = 'none';
-          customSwapBtn.style.padding = '8px 16px';
-          customSwapBtn.style.borderRadius = 'var(--radius-md)';
-          customSwapBtn.style.cursor = 'pointer';
-          customSwapBtn.style.marginLeft = '8px';
-          customSwapBtn.style.fontFamily = "'Prompt', sans-serif";
-          customSwapBtn.style.fontWeight = "bold";
-
-          customSwapBtn.onclick = () => {
-            stopBtn.click();
-            if (customSwapBtn) customSwapBtn.remove();
-            
-            // Allow UI breakdown duration
-            const repoll = setInterval(() => {
-              const activeSelect = document.getElementById('reader__camera_selection') as HTMLSelectElement;
-              const activeStart = document.getElementById('html5-qrcode-button-camera-start');
-              
-              if (activeSelect && activeStart) {
-                 clearInterval(repoll);
-                 const currentIdx = activeSelect.selectedIndex;
-                 let nextIdx = (currentIdx + 1) % activeSelect.options.length;
-
-                 // Iterate rapidly over ignored duplicates until hitting the next logical OS layer
-                 for (let attempts = 0; attempts < activeSelect.options.length; attempts++) {
-                    if (activeSelect.options[nextIdx].style.display !== 'none' && activeSelect.options[nextIdx].value !== '') {
-                      break;
-                    }
-                    nextIdx = (nextIdx + 1) % activeSelect.options.length;
-                 }
-                 
-                 activeSelect.selectedIndex = nextIdx;
-                 activeSelect.dispatchEvent(new Event('change'));
-                 // Engage Engine directly on the newly active port
-                 setTimeout(() => document.getElementById('html5-qrcode-button-camera-start')?.click(), 300);
-              }
-            }, 100);
-          };
-          
-          stopBtn.parentNode?.insertBefore(customSwapBtn, stopBtn.nextSibling);
-        }
+      if (startBtn && startBtn.style.display !== 'none' && !startBtn.hasAttribute('data-auto-clicked')) {
+        startBtn.setAttribute('data-auto-clicked', 'true');
+        setTimeout(() => { if (isMounted) startBtn.click(); }, 300);
       }
     };
 
-    const observer = new MutationObserver(translateUI);
+    const observer = new MutationObserver(automateCore);
     const targetNode = document.getElementById('reader');
     if (targetNode) {
       observer.observe(targetNode, { childList: true, subtree: true });
-      translateUI(); // Initial translation sweep
+      automateCore();
     }
 
     return () => {
-      if (observer) observer.disconnect();
+      isMounted = false;
+      observer.disconnect();
       if (scannerRef.current) {
-        scannerRef.current.clear().catch(error => {
-          console.error("Failed to clear html5QrcodeScanner. ", error);
-        });
+        scannerRef.current.clear().catch(console.error);
+        scannerRef.current = null;
       }
     };
-  }, [onScanSuccess]);
+  }, [onScanSuccess, cameraMode]);
+
+  const handleSwapCamera = async () => {
+    if (isSwapping) return;
+    setIsSwapping(true);
+    
+    if (scannerRef.current) {
+      try {
+        await scannerRef.current.clear();
+      } catch (e) {
+        console.error("Safeshutdown error", e);
+      }
+    }
+    
+    setCameraMode(prev => prev === 'environment' ? 'user' : 'environment');
+    setTimeout(() => setIsSwapping(false), 500);
+  };
 
   return (
-    <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      <div style={{ textAlign: 'center', marginBottom: '10px' }}>
+    <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <div style={{ textAlign: 'center' }}>
         <h2 style={{ fontSize: '1.25rem', marginBottom: '8px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
           <Camera size={24} color="var(--primary)" />
           เครื่องสแกนคิวอาร์ (Scanner)
         </h2>
-        <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>อนุญาตให้เข้าถึงกล้องเพื่อสแกน หรืออัปโหลดรูปภาพที่มี QR Code</p>
+        <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>หันกล้องเพื่อให้ระบบถอดรหัสอัตโนมัติ</p>
       </div>
+
+      <button 
+        className="btn" 
+        onClick={handleSwapCamera}
+        disabled={isSwapping}
+        style={{ width: '100%', padding: '12px', background: 'var(--input-bg)', border: '1px solid var(--border-color)', color: 'var(--text-main)', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', cursor: isSwapping ? 'not-allowed' : 'pointer' }}
+      >
+        <RefreshCcw size={20} className={isSwapping ? "spin-anim" : ""} />
+        {isSwapping ? 'กำลังสลับกล้อง...' : `🔄 สลับไปใช้กล้อง${cameraMode === 'environment' ? 'หน้า (Front)' : 'หลัง (Back)'}`}
+      </button>
 
       <div style={{
           background: 'var(--input-bg)',
@@ -195,13 +129,17 @@ export default function ScannerSidebar({ onScanSuccess }: ScannerSidebarProps) {
           boxShadow: '0 4px 6px rgba(0,0,0,0.2)'
         }}
       >
-        {/* The target Div for html5-qrcode to inject the UI */}
         <div id="reader" style={{ width: '100%', border: 'none' }}></div>
       </div>
       
-      {/* CSS Overrides for HTML5 QRCode Library injection */}
       <style>{`
+        /* Nuke ugly OS-level native inputs from HTML5-QRCode */
+        #reader__camera_selection { display: none !important; }
+        #html5-qrcode-button-camera-stop { display: none !important; }
+        #reader__dashboard_section_csr span { display: none !important; }
         #reader { border: none !important; }
+        
+        /* Format remaining dashboard controls for Image fallback */
         #reader__dashboard_section_csr button, #reader__dashboard_section_swaplink {
           background-color: var(--primary) !important;
           color: white !important;
@@ -217,24 +155,12 @@ export default function ScannerSidebar({ onScanSuccess }: ScannerSidebarProps) {
         #reader__dashboard_section_csr button:hover, #reader__dashboard_section_swaplink:hover {
           opacity: 0.9 !important;
         }
-        #reader__camera_selection {
-          padding: 8px !important;
-          border-radius: var(--radius-md) !important;
-          border: 1px solid var(--border-color) !important;
-          background: var(--bg-main) !important;
-          color: var(--text-main) !important;
-          margin-bottom: 10px !important;
-          font-family: 'Prompt', sans-serif !important;
-          width: 100% !important;
+        
+        /* Spin animation for Swap Camera UX */
+        .spin-anim {
+          animation: spin 1s linear infinite;
         }
-        #reader__dashboard_section_csr span, #reader__dashboard_section_swaplink {
-          color: var(--text-main) !important;
-          font-family: 'Prompt', sans-serif !important;
-        }
-        #reader__scan_region {
-           background-color: var(--bg-main) !important;
-        }
-        #reader a { color: var(--primary) !important; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
       `}</style>
     </div>
   );
