@@ -51,8 +51,44 @@ export default function ScannerSidebar({ onScanSuccess }: ScannerSidebarProps) {
           const val = node.nodeValue.trim();
           if (texts[val]) {
             node.nodeValue = node.nodeValue.replace(val, texts[val]);
+          } else if (val.match(/^Select Camera \(\d+\)$/)) {
+            node.nodeValue = "สลับกล้อง (Select Camera)";
           }
         }
+      }
+
+      const cameraSelect = document.getElementById('reader__camera_selection') as HTMLSelectElement;
+      if (cameraSelect) {
+        let hasFront = false;
+        let hasBack = false;
+
+        Array.from(cameraSelect.options).forEach((opt, index) => {
+          if (!opt.value) return; 
+
+          const label = opt.text.toLowerCase();
+          const isFront = label.includes('front') || label.includes('face') || label.includes('user');
+          const isBack = label.includes('back') || label.includes('rear') || label.includes('environment') || label.includes('0') || label.includes('1') || label.includes('2');
+
+          if (isFront) {
+            if (!hasFront) {
+              opt.text = "📷 กล้องหน้า (Front Camera)";
+              opt.style.display = "block";
+              hasFront = true;
+            } else {
+              opt.style.display = "none";
+            }
+          } else if (isBack) {
+            if (!hasBack) {
+              opt.text = "📸 กล้องหลัง (Back Camera)";
+              opt.style.display = "block";
+              hasBack = true;
+            } else {
+              opt.style.display = "none";
+            }
+          } else {
+             opt.text = `กล้อง ${index} (Camera)`;
+          }
+        });
       }
     };
 
