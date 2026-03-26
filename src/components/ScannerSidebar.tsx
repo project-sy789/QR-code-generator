@@ -11,6 +11,7 @@ export default function ScannerSidebar({ onScanSuccess }: ScannerSidebarProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [cameraMode, setCameraMode] = useState<'environment' | 'user'>('environment');
   const [isSwapping, setIsSwapping] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -107,6 +108,39 @@ export default function ScannerSidebar({ onScanSuccess }: ScannerSidebarProps) {
     e.target.value = '';
   };
 
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    const file = e.dataTransfer.files?.[0];
+    if (!file || !file.type.startsWith('image/')) {
+       alert("กรุณาอัปโหลดไฟล์รูปภาพเท่านั้น (Please drop an image file)");
+       return;
+    }
+
+    setIsSwapping(true);
+    try {
+      const html5QrCode = new Html5Qrcode("fast-file-reader");
+      const text = await html5QrCode.scanFile(file, true);
+      onScanSuccess(text);
+      html5QrCode.clear();
+    } catch (err) {
+      alert("ไม่พบรหัส QR Code ในรูปภาพนี้ กรุณาลองใหม่ (No QR Code found)");
+      console.warn("Drag & Drop Decode Failed", err);
+    }
+    setIsSwapping(false);
+  };
+
   return (
     <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
       <div style={{ textAlign: 'center' }}>
@@ -139,15 +173,37 @@ export default function ScannerSidebar({ onScanSuccess }: ScannerSidebarProps) {
         </button>
       </div>
 
-      <div style={{
+      <div 
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        style={{
           background: 'var(--input-bg)',
           borderRadius: 'var(--radius-lg)',
           overflow: 'hidden',
-          border: '1px solid var(--border-color)',
-          boxShadow: '0 4px 6px rgba(0,0,0,0.2)'
+          border: isDragging ? '2px dashed var(--primary)' : '1px solid var(--border-color)',
+          boxShadow: isDragging ? '0 0 20px rgba(59, 130, 246, 0.4)' : '0 4px 6px rgba(0,0,0,0.2)',
+          transition: 'all 0.2s ease',
+          position: 'relative'
         }}
       >
-        <div id="reader" style={{ width: '100%', border: 'none' }}></div>
+        <div id="reader" style={{ width: '100%', border: 'none', opacity: isDragging ? 0.2 : 1, transition: 'opacity 0.2s ease' }}></div>
+        
+        {isDragging && (
+          <div style={{
+            position: 'absolute',
+            top: 0, left: 0, right: 0, bottom: 0,
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+            background: 'rgba(0,0,0,0.4)',
+            backdropFilter: 'blur(4px)',
+            color: 'white',
+            zIndex: 10,
+            pointerEvents: 'none'
+          }}>
+             <ImageIcon size={48} color="var(--primary)" style={{ marginBottom: '16px', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))' }} />
+             <h3 style={{ fontSize: '1.25rem', fontFamily: "'Prompt', sans-serif", fontWeight: 'bold', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>วางรูปภาพที่นี่ (Drop Image)</h3>
+          </div>
+        )}
       </div>
       
       {/* Invisible anchor target for standalone image array decoder */}
