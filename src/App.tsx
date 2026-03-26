@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import './App.css';
-import { QrCode, Moon, Sun } from 'lucide-react';
+import { QrCode, Moon, Sun, ScanLine } from 'lucide-react';
 import { motion } from 'framer-motion';
 import DataSidebar from './components/DataSidebar';
 import StyleSidebar from './components/StyleSidebar';
 import BatchSidebar from './components/BatchSidebar';
+import ScannerSidebar from './components/ScannerSidebar';
+import ScannerResultPreview from './components/ScannerResultPreview';
 import QRCodePreview, { type QRCodeOptions } from './components/QRCodePreview';
 import SEOContent from './components/SEOContent';
 import { buildQRDataString, type QRDataState } from './utils/qrBuilders';
@@ -47,7 +49,8 @@ function App() {
     return (localStorage.getItem('qr-theme') as 'dark' | 'light') || 'dark';
   });
 
-  const [appMode, setAppMode] = useState<'single' | 'batch'>('single');
+  const [appMode, setAppMode] = useState<'single' | 'batch' | 'scan'>('single');
+  const [scannedResult, setScannedResult] = useState<string | null>(null);
 
   const [dataState, setDataState] = useState<QRDataState>(() => {
     const saved = localStorage.getItem('qr-data-state-v4');
@@ -135,23 +138,29 @@ function App() {
             onClick={() => setAppMode('single')}
             style={{ flex: 1, padding: '10px 8px', fontSize: '0.9rem', borderRadius: 'var(--radius-md)', background: appMode === 'single' ? 'var(--primary)' : 'transparent', border: 'none' }}
           >
-            สร้างทีละรูป (Single)
+            สร้างคิวอาร์
           </button>
           <button 
             className={`btn ${appMode === 'batch' ? '' : 'btn-secondary'}`} 
             onClick={() => setAppMode('batch')}
             style={{ flex: 1, padding: '10px 8px', fontSize: '0.9rem', borderRadius: 'var(--radius-md)', background: appMode === 'batch' ? 'var(--primary)' : 'transparent', border: 'none' }}
           >
-            สร้างแบบไฟล์ (Batch)
+            สร้างจัดชุด
+          </button>
+          <button 
+            className={`btn ${appMode === 'scan' ? '' : 'btn-secondary'}`} 
+            onClick={() => setAppMode('scan')}
+            style={{ flex: 1, padding: '10px 8px', fontSize: '0.9rem', borderRadius: 'var(--radius-md)', background: appMode === 'scan' ? 'var(--primary)' : 'transparent', border: 'none', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '4px' }}
+          >
+            <ScanLine size={16} /> สแกนอ่าน
           </button>
         </div>
 
-        {appMode === 'single' ? (
-          <DataSidebar dataState={dataState} setDataState={setDataState} />
-        ) : (
-          <BatchSidebar options={qrOptions} />
-        )}
-        <StyleSidebar options={qrOptions} setOptions={setQrOptions} />
+        {appMode === 'single' && <DataSidebar dataState={dataState} setDataState={setDataState} />}
+        {appMode === 'batch' && <BatchSidebar options={qrOptions} />}
+        {appMode === 'scan' && <ScannerSidebar onScanSuccess={(text) => setScannedResult(text)} />}
+        
+        {appMode !== 'scan' && <StyleSidebar options={qrOptions} setOptions={setQrOptions} />}
       </motion.main>
 
       <motion.aside 
@@ -160,7 +169,11 @@ function App() {
         animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
         transition={{ ...springTransition, delay: 0.2 }}
       >
-        <QRCodePreview options={qrOptions} />
+        {appMode === 'scan' ? (
+          <ScannerResultPreview scannedResult={scannedResult} />
+        ) : (
+          <QRCodePreview options={qrOptions} />
+        )}
       </motion.aside>
 
       <motion.div 

@@ -1,0 +1,101 @@
+import { useEffect, useRef } from 'react';
+import { Html5QrcodeScanner, Html5QrcodeScanType } from 'html5-qrcode';
+import { Camera } from 'lucide-react';
+
+interface ScannerSidebarProps {
+  onScanSuccess: (decodedText: string) => void;
+}
+
+export default function ScannerSidebar({ onScanSuccess }: ScannerSidebarProps) {
+  const scannerRef = useRef<Html5QrcodeScanner | null>(null);
+
+  useEffect(() => {
+    // Initialize Scanner on Mount
+    const config = {
+      fps: 10,
+      qrbox: { width: 250, height: 250 },
+      rememberLastUsedCamera: true,
+      supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA, Html5QrcodeScanType.SCAN_TYPE_FILE]
+    };
+
+    const scanner = new Html5QrcodeScanner("reader", config, false);
+    scannerRef.current = scanner;
+
+    scanner.render((decodedText) => {
+      onScanSuccess(decodedText);
+      // Optional: Pause scanner on success 
+      // scanner.pause();
+    }, () => {
+      // Background scan errors (ignored natively)
+    });
+
+    return () => {
+      // Cleanup on Unmount
+      if (scannerRef.current) {
+        scannerRef.current.clear().catch(error => {
+          console.error("Failed to clear html5QrcodeScanner. ", error);
+        });
+      }
+    };
+  }, [onScanSuccess]);
+
+  return (
+    <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      <div style={{ textAlign: 'center', marginBottom: '10px' }}>
+        <h2 style={{ fontSize: '1.25rem', marginBottom: '8px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+          <Camera size={24} color="var(--primary)" />
+          เครื่องสแกนคิวอาร์ (Scanner)
+        </h2>
+        <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>อนุญาตให้เข้าถึงกล้องเพื่อสแกน หรืออัปโหลดรูปภาพที่มี QR Code</p>
+      </div>
+
+      <div style={{
+          background: 'var(--input-bg)',
+          borderRadius: 'var(--radius-lg)',
+          overflow: 'hidden',
+          border: '1px solid var(--border-color)',
+          boxShadow: '0 4px 6px rgba(0,0,0,0.2)'
+        }}
+      >
+        {/* The target Div for html5-qrcode to inject the UI */}
+        <div id="reader" style={{ width: '100%', border: 'none' }}></div>
+      </div>
+      
+      {/* CSS Overrides for HTML5 QRCode Library injection */}
+      <style>{`
+        #reader { border: none !important; }
+        #reader__dashboard_section_csr button, #reader__dashboard_section_swaplink {
+          background-color: var(--primary) !important;
+          color: white !important;
+          border: none !important;
+          padding: 8px 16px !important;
+          border-radius: var(--radius-md) !important;
+          cursor: pointer !important;
+          margin: 4px !important;
+          font-family: 'Prompt', sans-serif !important;
+        }
+        #reader__dashboard_section_csr button:hover, #reader__dashboard_section_swaplink:hover {
+          opacity: 0.9 !important;
+        }
+        #reader__camera_selection {
+          padding: 8px !important;
+          border-radius: var(--radius-md) !important;
+          border: 1px solid var(--border-color) !important;
+          background: var(--bg-main) !important;
+          color: var(--text-main) !important;
+          margin-bottom: 10px !important;
+          font-family: 'Prompt', sans-serif !important;
+          width: 100% !important;
+        }
+        #reader__dashboard_section_csr span, #reader__dashboard_section_swaplink {
+          color: var(--text-main) !important;
+          font-family: 'Prompt', sans-serif !important;
+        }
+        #reader__scan_region {
+           background-color: var(--bg-main) !important;
+        }
+        #reader a { color: var(--primary) !important; }
+      `}</style>
+    </div>
+  );
+}
